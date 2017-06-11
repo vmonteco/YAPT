@@ -344,9 +344,6 @@ if __name__ == '__main__':
     lks_set = cases.lks_set if args.leaks or all_tests else None
 
     t = Tester()
-    print(dir(t.f1))
-    print(t.f2.__name__)
-    print(t.f1 == t.f2)
     t.run(cmp_sets=cmp_sets, segv_set=segv_set, lks_set=lks_set,
           verbose=args.verbose, quiet=args.quiet)
     if (args.leaks or all_tests):
