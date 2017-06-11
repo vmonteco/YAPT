@@ -9,7 +9,7 @@ all: lib
 lib: $(LIB_SO)
 
 $(LIB_SO): $(LIB_A)
-	gcc -shared -o $@ $<
+	gcc -shared -o $@ -Wl,-all_load $<
 
 $(LIB_A): FORCE
 	make -C $(FT_PRINTF_PATH) all
