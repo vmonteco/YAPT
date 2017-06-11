@@ -16,46 +16,22 @@ BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 libftprintf = ctypes.cdll.LoadLibrary(os.path.join(BASE_DIR, 'libftprintf.so'))
 libc = ctypes.cdll.LoadLibrary(ctypes.util.find_library('c'))
 
-ft_printf = libftprintf.printf
+ft_printf = libftprintf.ft_printf
 printf = libc.printf
 
-
-# **************************************************************************** #
-#                               Defining colors.                               #
-# **************************************************************************** #
-
-def colored(s, colored):
-    return (s if colored else '')
-
-colors = {
-    'red' : colored('\033[91m', True),
-    'cyan' : colored('\033[96m', True),
-    'blue' : colored('\033[94m', True),
-    'prpl' : colored('\033[95m', True),
-    'grn' : colored('\033[92m', True),
-    'yllw' : colored('\033[93m', True),
-    'rst' : colored('\033[0m', True),
-}
-
-colors['succ'] = colors['grn']
-colors['fail'] = colors['red']
-colors['case'] = colors['prpl']
-colors['ntrl'] = colors['yllw']
-
-def colorize(s, res):
-    cols = colors
-    cols.update(res)
-    return (s.format(**cols))
 
 # **************************************************************************** #
 #                                Defining texts.                               #
 # **************************************************************************** #
 
 msgs = {
+    'welcome' : '{yllw}Welcome to this ft_printf testing tool!{rst}',
     'global_head' : '{grn}Welcome to this ft_printf test programm!{rst}',
     'global_res' : '{res}Global{rst} : [{res}%d{rst}/{grn}%d{rst}]',
-    'subset_head' : '--- Running "{grn}%s{rst}" tests. ---',
-    'subset_res' : '*** {res}%s{rst} results : [{res}%d{rst}/{grn}%d{rst}]. ***',
+    'segv_res' : '{res}Segv tests passed{rst} : [{res}%d{rst}/{grn}%d{rst}]',
+    'segv_case_res' : '[{case}%r{rst}] -> [status : {res}%s{rst}]',
+    'subset_head' : '*** Running "{grn}%s{rst}" tests. ***',
+    'subset_res' : '--- {res}%s{rst} results : [{res}%d{rst}/{grn}%d{rst}]. ---',
 
     'test_normal_res' : (
         '[{case}%r{rst}] -> [printf/ft_printf]'
@@ -66,8 +42,7 @@ msgs = {
         '[{res1}%d{rst}/{res2}%d{rst}] ({red}%s{rst}).'
     )
 }
-            
-            
+
 # **************************************************************************** #
 #                            Defining Tester class.                            #
 # **************************************************************************** #
@@ -87,10 +62,15 @@ class Tester:
         }
 
         
-    def run(self, verbose=False, color=True):
-        print(messages('welcome'))
-
-        
+    def run(self, cmp_sets=None, segv_set=None, lks_set=None, verbose=False):
+        print(colorize(self.msgs['welcome']))
+        if cmp_sets:
+            self.run_cmp_cases(cmp_sets, verbose)
+        if segv_set:
+            self.run_segv_cases(segv_set, verbose)
+        if lks_set:
+            self.run_lks_cases(lks_set, verbose)
+            
     def run_in_subprocess(self, function, case):
         pipes = {}
         pipes['output_r'], pipes['output_w'] = os.pipe()
@@ -112,18 +92,19 @@ class Tester:
             res = {}
             os.close(pipes['output_w'])
             os.close(pipes['return_w'])
-            output_in = os.fdopen(pipes['output_r'])
+            output_in = os.fdopen(pipes['output_r'], encoding='cp1252')
             return_in = os.fdopen(pipes['return_r'])
             res['output'] = output_in.read()
             res['return'] = int(return_in.read())
             res['status'] = os.waitpid(pid, 0)[1]
             return res
 
-    def run_cmp_cases(self, cases):
+        
+    def run_cmp_cases(self, cases, verbose=False):
         self.counters['global_tried'] = 0
         self.counters['global_success'] = 0
         for case in cases:
-            self.run_cmp_cases_subsets(case)
+            self.run_cmp_cases_subsets(case, verbose)
         if self.counters['global_tried'] > 0:
             success = self.counters['global_tried'] == self.counters['global_success']
             col = colors['succ'] if success else colors['fail']
@@ -134,13 +115,13 @@ class Tester:
                     self.counters['global_tried'],
                 )
             )
-            
-    def run_cmp_cases_subsets(self, cases):
+
+    def run_cmp_cases_subsets(self, cases, verbose=False):
         self.counters['local_tried'] = 0
         self.counters['local_success'] = 0
         print(colorize(self.msgs['subset_head'], {}) % (cases['name'],))
         for case in cases['cases']:
-            self.run_cmp_case(case)
+            self.run_cmp_case(case, verbose)
         if self.counters['local_tried'] > 0:
             success = (
                 self.counters['local_tried'] == self.counters['local_success']
@@ -155,15 +136,17 @@ class Tester:
             )
               
         
-    def run_cmp_case(self, case):
+    def run_cmp_case(self, case, verbose=False):
         res = {
             'f1' : self.run_in_subprocess(self.f1, case),
             'f2' : self.run_in_subprocess(self.f2, case),
         }
-        self.interpret_results(case, res)
+        self.interpret_cmp_results(case, res, verbose)
+
         
-    def interpret_results(self, case, res):
+    def interpret_cmp_results(self, case, res, verbose=False):
         cols = {}
+        m = None
         if (res['f1']['status'] == 0 and res['f2']['status'] == 0) :
             out_ok = (res['f1']['output'] == res['f2']['output'])
             ret_ok = (res['f1']['return'] == res['f2']['return'])
@@ -174,23 +157,158 @@ class Tester:
                 self.counters['global_success'] += 1
             self.counters['local_tried'] += 1
             self.counters['global_tried'] += 1
-            m = (colorize(self.msgs['test_normal_res'], cols)
-                 % (
-                     ', '.join([str(i) for i in case]),
-                     res['f1']['return'],
-                     res['f2']['return'],
-                     res['f1']['output'],
-                     res['f2']['output']
-                ))
-            print(m)
+            if (not (ret_ok and out_ok)) or verbose:
+                m = (colorize(self.msgs['test_normal_res'], cols)
+                     % (
+                         ', '.join([str(i) for i in case]),
+                         res['f1']['return'],
+                         res['f2']['return'],
+                         res['f1']['output'],
+                         res['f2']['output']
+                     ))
+        elif (res['f1']['status'] == res['f2']['status']):
+            m = 'error on both case.'
         else:
-            print('error')    
+            m = 'different exit statuses.'
+        if m:
+            print(m)
+
+            
+    def run_segv_cases(self, cases, verbose=False):
+        self.counters['global_tried'] = 0
+        self.counters['global_success'] = 0
+        for case in cases:
+            res = self.run_in_subprocess(self.f2, case)
+            self.interpret_segv_result(res, case, verbose)
+        self.print_segv_cases_result()
+
+        
+    def interpret_segv_result(self, result, case, verbose=False):
+        self.counters['global_tried'] += 1
+        if result['status'] == 0:
+            self.counters['global_success'] += 1
+        if result['status'] != 0 or verbose:
+            res = colors['succ'] if result['status'] == 0 else colors['fail']
+            print(
+                colorize(self.msgs['segv_case_res'], {'res' : res})
+                % (
+                    case,
+                    result['status']
+                )
+            )
+
+            
+    def print_segv_cases_result(self):
+        succ = (
+            self.counters['global_tried']
+            == self.counters['global_success']
+        )
+        res = colors['succ'] if succ else colors['fail']
+        print(
+            colorize(self.msgs['segv_res'], {'res' : res})
+            % (
+                self.counters['global_success'],
+                self.counters['global_tried']
+            )
+        )
+
+    def run_lks_cases(self, cases, verbose=False):
+        print("Running cases to test leaks.")
+        for case in cases:
+            self.f2(*case)
+        
             
 # **************************************************************************** #
         
 if __name__ == '__main__':
-    t = Tester()
-    t.run_cmp_cases(cases.sets)
-    #ft_printf(b"foo\n")
-    #printf(b"foo\n")
 
+    # ************************************************************************ #
+    #                       Argument parser definition                         #
+    # ************************************************************************ #
+
+    parser = argparse.ArgumentParser(
+        description='This is a ft_printf python testing tool.',
+        epilog=(
+            'NB : If none of -c, -s, or -a args is passed to this tool, '
+            'every test sets is run in the following order : comparison, segv, '
+            'leaks.'
+        )
+    )
+    parser.add_argument('-v', '--verbose', action='store_true',
+                        help='this option enables successful results display.'
+    )
+    parser.add_argument('-u', '--uncolored', dest='colors',
+                        action='store_false', help='this option disable colors.'
+    )
+    parser.add_argument('-c', '--cmp', action='store_true',
+                        help='Enable comparison tests. It will run every case '
+                        'in a child process.'
+    )
+    parser.add_argument('-s', '--segv', action='store_true',
+                        help=(
+                            'Enable segmentation fault and other status errors'
+                            ' tests. It will run every case in a child process.'
+                        )
+    )
+    parser.add_argument('-a', '--all', action='store_true',
+                        help='Enable all (comparison + segfault + leaks) tests.'
+    )
+    parser.add_argument('-l', '--leaks', action='store_true',
+                        help=(
+                            'Enable leaks tests, it will run every case '
+                            'in the current process, then run an infinite loop'
+                            ' so you can run leaks. '
+                            'You\'ll have to ctrl+C to close the programm.'
+                            '\n/!\ If an error occurs, it won\'t be handled.'
+                            '/!\.'
+                        )
+    )
+    args = parser.parse_args()
+
+    # ************************************************************************ #
+    #                           Colors definition                              #
+    # ************************************************************************ #
+    
+    def colored(s):
+        return (s if args.colors else '')
+
+    colors = {
+        'red' : colored('\033[91m'),
+        'cyan' : colored('\033[96m'),
+        'blue' : colored('\033[94m'),
+        'prpl' : colored('\033[95m'),
+        'grn' : colored('\033[92m'),
+        'yllw' : colored('\033[93m'),
+        'rst' : colored('\033[0m'),
+    }
+    
+    colors['succ'] = colors['grn']
+    colors['fail'] = colors['red']
+    colors['case'] = colors['prpl']
+    colors['ntrl'] = colors['yllw']
+    
+    def colorize(s, res={}):
+        cols = colors
+        cols.update(res)
+        return (s.format(**cols))
+
+
+    # ************************************************************************ #
+    #                           Test sets defintion                            #
+    # ************************************************************************ #
+
+    all_tests = not (args.cmp or args.leaks or args.segv)
+    cmp_sets = cases.cmp_sets if args.cmp or all_tests else None
+    segv_set = cases.segv_set if args.segv or all_tests else None
+    lks_set = cases.lks_set if args.leaks or all_tests else None
+    
+    
+    t = Tester()
+    print(t.f1)
+    print(t.f2)
+    print(t.f1 == t.f2)
+    t.run(cmp_sets=cmp_sets, segv_set=segv_set, lks_set=lks_set,
+          verbose=args.verbose)
+    if (args.leaks or all_tests):
+        while (True):
+            pass

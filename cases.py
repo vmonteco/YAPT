@@ -30,7 +30,7 @@ UINT_MAX = ctypes.c_uint(-1).value
 LONG_MIN = -ctypes.c_ulong(-1).value // 2
 LONG_MAX = ctypes.c_ulong(-1).value // 2
 ULONG_MAX = ctypes.c_ulong(-1).value
-LLONG_MIN = -ctypes.c_ulonglong(-1).value // 2 
+LLONG_MIN = -ctypes.c_ulonglong(-1).value // 2
 LLONG_MAX = ctypes.c_ulonglong(-1).value // 2
 ULLONG_MAX = ctypes.c_ulonglong(-1).value
 
@@ -40,10 +40,10 @@ ULLONG_MAX = ctypes.c_ulonglong(-1).value
 # **************************************************************************** #
 
 
-options = [b''] + [b' ', b'+', b'-', b'0', b'#']
-min_len = [b'', b'0', b'1', b'-1', b'2', b'-2', b'-10', b'10', b'100', b'-100', b'bar']
-precision = [b'', b'.', b'.0', b'.1', b'.-1', b'.5', b'.-10', b'.10', b'.100', b'.-100', b'.bar']
-len_mod = [b'', b'j', b'hh', b'll', b'l', b'h', b'z', b'bar']
+options = [b''.join(list(i)) for i in powerset([b' ', b'+', b'-', b'0', b'#'])]
+min_len = [b'', b'0', b'1', b'2',  b'10']
+precision = [b'', b'.', b'.0', b'.1', b'.2', b'.10']
+len_mod = [b'', b'j', b'hh', b'll', b'l', b'h', b'z']
 #conv_spec = [''] + [i for i in "cCsSpdDioOxXuU%a"]
 
 
@@ -56,44 +56,22 @@ pos_num_vals = [
     ctypes.c_short(0),
     ctypes.c_short(1),
     ctypes.c_short(SHRT_MAX),
-    ctypes.c_ushort(0),
-    ctypes.c_ushort(1),
     ctypes.c_ushort(USHRT_MAX),
-    ctypes.c_byte(0),
-    ctypes.c_byte(1),
     ctypes.c_byte(CHAR_MAX),
-    ctypes.c_char(0),
-    ctypes.c_char(1),
     ctypes.c_char(UCHAR_MAX),
-    ctypes.c_int(0),
-    ctypes.c_int(1),
     ctypes.c_int(INT_MAX),
-    ctypes.c_uint(0),
-    ctypes.c_uint(1),
     ctypes.c_uint(UINT_MAX),
-    ctypes.c_long(0),
-    ctypes.c_long(1),
     ctypes.c_long(LONG_MAX),
-    ctypes.c_ulong(0),
-    ctypes.c_ulong(1),
     ctypes.c_ulong(ULONG_MAX),
-    ctypes.c_longlong(0),
-    ctypes.c_longlong(1),
     ctypes.c_longlong(LLONG_MAX),
-    ctypes.c_ulonglong(0),
-    ctypes.c_ulonglong(1),
     ctypes.c_ulonglong(ULLONG_MAX),
 ]
 neg_num_vals = [
     ctypes.c_short(-1),
     ctypes.c_short(SHRT_MIN),
-    ctypes.c_byte(-1),
     ctypes.c_byte(CHAR_MIN),
-    ctypes.c_int(-1),
     ctypes.c_int(INT_MIN),
-    ctypes.c_long(-1),
     ctypes.c_long(LONG_MIN),
-    ctypes.c_longlong(-1),
     ctypes.c_longlong(LLONG_MIN),
 ]
 char_vals = [
@@ -161,49 +139,19 @@ def all_cases():
                 for p in precision:
                     for lm in len_mod:
                         for v in s[2]:
-                            for opt in powerset(options):
-                                yield([b''.join([b'%', b''.join(opt), ml, p, lm, s[1], b'\n']), v])
+                            for opt in options:
+                                yield([b''.join([b'%', opt, ml, p, lm, s[1], b'\n']), v])
 
         yield({
             'name' : s[0],
             'cases' : f(),
         })
 
-sets = all_cases()
-        
-# val = [
-#     None,
-#     b'foo',
-#     b'bar',
-    
-# ]
-# all_cases = []
-
-# sets = [
-#     {
-#         'name' : 'test test',
-#         'cases' : [
-#             [b'foo',],
-#             [b'far',],
-#         ]
-#     },
-#     {
-#         'name' : 'test test bis',
-#         'cases' : [
-#             [b'foo'],
-#             [b'far'],
-#         ]
-#     },
-    
-# ]
+cmp_sets = all_cases()
 
 segv_cases = [
 ]
 
-undef_cases = [
+segv_set = []
 
-]
-
-leak_cases = [
-
-]
+lks_set = []
