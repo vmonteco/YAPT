@@ -62,16 +62,28 @@ class Tester:
         }
 
         
-    def run(self, cmp_sets=None, segv_set=None, lks_set=None, verbose=False):
+    def run(self, cmp_sets=None, segv_set=None, lks_set=None, verbose=False,
+            quiet=False):
+        """
+        This is the main run() method. It will (or not) trigger other 
+        run submethods.
+        """
         print(colorize(self.msgs['welcome']))
         if cmp_sets:
-            self.run_cmp_cases(cmp_sets, verbose)
+            self.run_cmp_cases(cmp_sets, verbose, quiet)
         if segv_set:
-            self.run_segv_cases(segv_set, verbose)
+            self.run_segv_cases(segv_set, verbose, quiet)
         if lks_set:
-            self.run_lks_cases(lks_set, verbose)
+            self.run_lks_cases(lks_set, verbose, quiet)
+
             
     def run_in_subprocess(self, function, case):
+        """
+        This method run a test case by passing it to both f1 and f2,
+        and by running it in subprocesses.
+        It monitors the output on STDOUT, the function's return and the
+        child process exit status..
+        """
         pipes = {}
         pipes['output_r'], pipes['output_w'] = os.pipe()
         pipes['return_r'], pipes['return_w'] = os.pipe()
@@ -100,11 +112,14 @@ class Tester:
             return res
 
         
-    def run_cmp_cases(self, cases, verbose=False):
+    def run_cmp_cases(self, cases, verbose=False, quiet=False):
+        """
+        This run submethod just run test sets by calling run_in_subprocess().
+        """
         self.counters['global_tried'] = 0
         self.counters['global_success'] = 0
         for case in cases:
-            self.run_cmp_cases_subsets(case, verbose)
+            self.run_cmp_cases_subsets(case, verbose, quiet)
         if self.counters['global_tried'] > 0:
             success = self.counters['global_tried'] == self.counters['global_success']
             col = colors['succ'] if success else colors['fail']
@@ -116,12 +131,15 @@ class Tester:
                 )
             )
 
-    def run_cmp_cases_subsets(self, cases, verbose=False):
+    def run_cmp_cases_subsets(self, cases, verbose=False, quiet=False):
+        """
+        This run submethod just run test subsets by calling run_in_subprocess().
+        """        
         self.counters['local_tried'] = 0
         self.counters['local_success'] = 0
         print(colorize(self.msgs['subset_head'], {}) % (cases['name'],))
         for case in cases['cases']:
-            self.run_cmp_case(case, verbose)
+            self.run_cmp_case(case, verbose, quiet)
         if self.counters['local_tried'] > 0:
             success = (
                 self.counters['local_tried'] == self.counters['local_success']
@@ -136,15 +154,23 @@ class Tester:
             )
               
         
-    def run_cmp_case(self, case, verbose=False):
+    def run_cmp_case(self, case, verbose=False, quiet=False):
+        """
+        This method just runs an actual test by calling
+        run_in_subprocess().
+        """
         res = {
             'f1' : self.run_in_subprocess(self.f1, case),
             'f2' : self.run_in_subprocess(self.f2, case),
         }
-        self.interpret_cmp_results(case, res, verbose)
+        self.interpret_cmp_results(case, res, verbose, quiet)
 
         
-    def interpret_cmp_results(self, case, res, verbose=False):
+    def interpret_cmp_results(self, case, res, verbose=False, quiet=False):
+        """
+        This method manges the display of the results for comparison tests.
+        It also stores the success/failure to count it in the final ratio.
+        """
         cols = {}
         m = None
         if (res['f1']['status'] == 0 and res['f2']['status'] == 0) :
@@ -157,7 +183,7 @@ class Tester:
                 self.counters['global_success'] += 1
             self.counters['local_tried'] += 1
             self.counters['global_tried'] += 1
-            if (not (ret_ok and out_ok)) or verbose:
+            if (not (ret_ok and out_ok)) or verbose and not quiet:
                 m = (colorize(self.msgs['test_normal_res'], cols)
                      % (
                          ', '.join([str(i) for i in case]),
@@ -170,11 +196,11 @@ class Tester:
             m = 'error on both case.'
         else:
             m = 'different exit statuses.'
-        if m:
+        if m and not quiet:
             print(m)
 
             
-    def run_segv_cases(self, cases, verbose=False):
+    def run_segv_cases(self, cases, verbose=False, quiet=False):
         self.counters['global_tried'] = 0
         self.counters['global_success'] = 0
         for case in cases:
@@ -183,7 +209,7 @@ class Tester:
         self.print_segv_cases_result()
 
         
-    def interpret_segv_result(self, result, case, verbose=False):
+    def interpret_segv_result(self, result, case, verbose=False, quiet=False):
         self.counters['global_tried'] += 1
         if result['status'] == 0:
             self.counters['global_success'] += 1
@@ -212,7 +238,7 @@ class Tester:
             )
         )
 
-    def run_lks_cases(self, cases, verbose=False):
+    def run_lks_cases(self, cases, verbose=False, quiet=False):
         print("Running cases to test leaks.")
         for case in cases:
             self.f2(*case)
@@ -236,6 +262,12 @@ if __name__ == '__main__':
     )
     parser.add_argument('-v', '--verbose', action='store_true',
                         help='this option enables successful results display.'
+    )
+    parser.add_argument('-q', '--quiet', action='store_true',
+                        help=('this option disables any case results display.'
+                              'It permits to have a short yet global view on '
+                              'every test set result'
+                        )
     )
     parser.add_argument('-u', '--uncolored', dest='colors',
                         action='store_false', help='this option disable colors.'
@@ -304,11 +336,11 @@ if __name__ == '__main__':
     
     
     t = Tester()
-    print(t.f1)
-    print(t.f2)
+    print(dir(t.f1))
+    print(t.f2.__name__)
     print(t.f1 == t.f2)
     t.run(cmp_sets=cmp_sets, segv_set=segv_set, lks_set=lks_set,
-          verbose=args.verbose)
+          verbose=args.verbose, quiet=args.quiet)
     if (args.leaks or all_tests):
         while (True):
             pass
