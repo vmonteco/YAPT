@@ -57,7 +57,7 @@ class Tester:
 
     def __init__(self, f1=printf, f2=ft_printf):
         self.f1 = f1
-        self.f2 = f2 # function to test
+        self.f2 = f2  # function to test
         self.counters = {
             'global_success': 0,
             'global_tried': 0,
@@ -153,7 +153,7 @@ class Tester:
                   % (
                       self.counters['local_exit_err']
                   ))
-            
+
     def run_cmp_cases_subsets(self, cases, verbose=False, quiet=False):
         """
         This run submethod just run test subsets by calling
@@ -181,7 +181,7 @@ class Tester:
                       % (
                           self.counters['local_exit_err']
                       ))
-            
+
     def run_cmp_case(self, case, verbose=False, quiet=False):
         """
         This method just runs an actual test by calling
@@ -292,7 +292,7 @@ if __name__ == '__main__':
 
     dir = os.path.dirname(os.path.abspath(args.filename))
     f = os.path.basename(os.path.abspath(args.filename))
-    mod = imp.find_module(os.path.splitext(f)[0], [dir]) 
+    mod = imp.find_module(os.path.splitext(f)[0], [dir])
     if mod:
         try:
             m = imp.load_module('cases', *mod)
