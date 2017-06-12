@@ -147,7 +147,7 @@ def all_cases():
             'cases' : f(),
         })
 
-cmp_sets = all_cases()
+cases = all_cases()
 
 segv_cases = [
 ]

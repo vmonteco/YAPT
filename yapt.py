@@ -6,6 +6,8 @@ import sys
 import argparse
 import ctypes
 import ctypes.util
+import imp
+import importlib
 import cases
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -19,7 +21,6 @@ libc = ctypes.cdll.LoadLibrary(ctypes.util.find_library('c'))
 
 ft_printf = libftprintf.ft_printf
 printf = libc.printf
-
 
 # *************************************************************************** #
 #                                Defining texts.                              #
@@ -35,13 +36,14 @@ msgs = {
     'subset_res':
     '--- {res}%s{rst} results : [{res}%d{rst}/{grn}%d{rst}]. ---',
     'test_normal_res': (
-        '[{case}%r{rst}] -> [%s/%s]'
+        '[case: #%s][{case}%r{rst}] -> [%s/%s]'
         '[{grn}%d{rst}/{res1}%d{rst}][{grn}%r{rst}/{res2}%r{rst}].'
     ),
     'test_err': (
-        '[{case}%r{rst}] -> [%s/%s]'
+        '[case: #%s][{case}%r{rst}] -> [%s/%s]'
         '[{res1}%d{rst}/{res2}%d{rst}] ({res}%s{rst}).'
-    )
+    ),
+    'exit_err': '{fail}%s cases exited non zero statuses.{rst}'
 }
 
 # *************************************************************************** #
@@ -61,22 +63,23 @@ class Tester:
             "global_tried": 0,
             "local_success": 0,
             "local_tried": 0,
+            "global_exit_err": 0,
+            "local_exit_err": 0,
         }
 
-    def run(self, cmp_sets=None, segv_set=None, lks_set=None, verbose=False,
-            quiet=False):
+    def run(self, cases=None, verbose=False,
+            quiet=False, lks=False):
         """
         This is the main run() method. It will (or not) trigger other
         run submethods.
         """
         print(colorize(self.msgs['welcome']))
-        if cmp_sets:
-            self.run_cmp_cases(cmp_sets, verbose, quiet)
-        if segv_set:
-            self.run_segv_cases(segv_set, verbose, quiet)
-        if lks_set:
-            self.run_lks_cases(lks_set, verbose, quiet)
-
+        self.run_cmp_cases(cases, verbose, quiet)
+        # if segv_set:
+        #     self.run_segv_cases(segv_set, verbose, quiet)
+        while lks_set:
+            pass
+            
     def run_in_subprocess(self, function, case):
         """
         This method run a test case by passing it to both f1 and f2,
@@ -131,7 +134,13 @@ class Tester:
                     self.counters['global_tried'],
                 )
             )
+        if (self.counters['local_exit_err'] != 0):
+            print(colorize(self.msgs['exit_err'])
+                  % (
+                      self.counters['local_exit_err']
+                  ))
 
+            
     def run_cmp_cases_subsets(self, cases, verbose=False, quiet=False):
         """
         This run submethod just run test subsets by calling
@@ -139,6 +148,7 @@ class Tester:
         """
         self.counters['local_tried'] = 0
         self.counters['local_success'] = 0
+        self.counters['local_exit_err'] = 0
         print(colorize(self.msgs['subset_head'], {}) % (cases['name'],))
         for case in cases['cases']:
             self.run_cmp_case(case, verbose, quiet)
@@ -153,7 +163,12 @@ class Tester:
                       self.counters['local_success'],
                       self.counters['local_tried']
                   ))
-
+            if (self.counters['local_exit_err'] != 0):
+                print(colorize(self.msgs['exit_err'])
+                      % (
+                          self.counters['local_exit_err']
+                      ))
+            
     def run_cmp_case(self, case, verbose=False, quiet=False):
         """
         This method just runs an actual test by calling
@@ -172,6 +187,8 @@ class Tester:
         """
         cols = {}
         m = None
+        if res['f2']['status'] != 0:
+            self.counters['err_exit'] += 1
         if (res['f1']['status'] == 0 and res['f2']['status'] == 0):
             out_ok = (res['f1']['output'] == res['f2']['output'])
             ret_ok = (res['f1']['return'] == res['f2']['return'])
@@ -185,6 +202,7 @@ class Tester:
             if (not (ret_ok and out_ok)) or verbose and not quiet:
                 m = (colorize(self.msgs['test_normal_res'], cols)
                      % (
+                         self.counters['global_tried'],
                          ', '.join([str(i) for i in case]),
                          self.f1.__name__,
                          self.f2.__name__,
@@ -199,6 +217,7 @@ class Tester:
             cols['res'] = colors['ntrl']
             m = (colorize(self.msgs['test_err'], cols)
                  % (
+                     self.counters['global_tried'],
                      ', '.join([str(i) for i in case]),
                      self.f1.__name__,
                      self.f2.__name__,
@@ -212,6 +231,7 @@ class Tester:
             cols['res'] = colors['fail']
             m = (colorize(self.msgs['test_err'], cols)
                  % (
+                     self.counters['global_tried'],
                      ', '.join([str(i) for i in case]),
                      self.f1.__name__,
                      self.f2.__name__,
@@ -288,12 +308,6 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--cmp', action='store_true',
                         help='Enable comparison tests. It will run every case '
                         'in a child process.')
-    parser.add_argument('-s', '--segv', action='store_true',
-                        help=(
-                            'Enable segmentation fault and other status errors'
-                            ' tests.'
-                            ' It will run every case in a child process.'
-                        ))
     parser.add_argument('-a', '--all', action='store_true',
                         help='Enable all (comparison+segfault+leaks) tests.')
     parser.add_argument('-l', '--leaks', action='store_true',
@@ -301,11 +315,29 @@ if __name__ == '__main__':
                             'Enable leaks tests, it will run every case '
                             'in the current process, then run an infinite loop'
                             ' so you can run leaks. '
-                            'You\'ll have to ctrl+C to close the programm.'
-                            '\n/!\ If an error occurs, it won\'t be handled.'
-                            '/!\.'
+                            'You\'ll have to ctrl+C to close the program.'
+                        ))
+    parser.add_argument('filename',
+                        help=(
+                            'A valid python3 file containing an iterable '
+                            'called "cases". This iterable will contain '
+                            'several case sets'
                         ))
     args = parser.parse_args()
+
+    # *********************************************************************** #
+    #                           importing cases                               #
+    # *********************************************************************** #
+
+    dir = os.path.dirname(os.path.abspath(args.filename))
+    f = os.path.basename(os.path.abspath(args.filename))
+    mod = imp.find_module(os.path.splitext(f)[0], [dir]) 
+    if mod:
+        try:
+            m = imp.load_module('cases', *mod)
+            cases = cases.cases
+        finally:
+            mod[0].close()
 
     # *********************************************************************** #
     #                           Colors definition                             #
@@ -338,14 +370,11 @@ if __name__ == '__main__':
     #                           Test sets defintion                           #
     # *********************************************************************** #
 
-    all_tests = not (args.cmp or args.leaks or args.segv)
-    cmp_sets = cases.cmp_sets if args.cmp or all_tests else None
-    segv_set = cases.segv_set if args.segv or all_tests else None
-    lks_set = cases.lks_set if args.leaks or all_tests else None
+    # all_tests = not (args.cmp or args.leaks or args.segv)
+    # cmp_sets = cases.cmp_sets if args.cmp or all_tests else None
+    # segv_set = cases.segv_set if args.segv or all_tests else None
+    # lks_set = cases.lks_set if args.leaks or all_tests else None
 
     t = Tester()
-    t.run(cmp_sets=cmp_sets, segv_set=segv_set, lks_set=lks_set,
-          verbose=args.verbose, quiet=args.quiet)
-    if (args.leaks or all_tests):
-        while (True):
-            pass
+    t.run(cases=cases,
+          verbose=args.verbose, quiet=args.quiet, lks=args.leaks)
