@@ -59,37 +59,41 @@ class Tester:
         self.f1 = f1
         self.f2 = f2 # function to test
         self.counters = {
-            "global_success": 0,
-            "global_tried": 0,
-            "local_success": 0,
-            "local_tried": 0,
-            "global_exit_err": 0,
-            "local_exit_err": 0,
+            'global_success': 0,
+            'global_tried': 0,
+            'local_success': 0,
+            'local_tried': 0,
+            'global_exit_err': 0,
+            'local_exit_err': 0,
         }
 
-    def run(self, cases_generator=None, verbose=False,
-            quiet=False, lks=False):
+    def run(self, cases_generator=None, verbose=False, quiet=False):
         """
         This is the main run() method. It will (or not) trigger other
         run submethods.
         """
         print(colorize(self.msgs['welcome']))
         self.run_cmp_cases(cases_generator(), verbose, quiet)
-        if lks:
-            if self.counters['global_exit_err'] == 0:
-                print("Running cases in current process...")
-                cases = cases_generator()
-                for s in cases:
-                    for c in s['cases']:
-                        self.f2(*s)
-                subprocess.call(['leaks', str(os.getpid())])
+        if self.counters['global_exit_err'] == 0:
+            print('Running cases in current process...')
+            cases = cases_generator()
+            for s in cases:
+                for c in s['cases']:
+                    self.f2(*s)
+            l = subprocess.call(['leaks', str(os.getpid())])
+            if l == 0:
+                print(colorize('{succ}No leaks found.{rst}'))
+            elif l > 1:
+                print(colorize('{fail}An error occured with leaks.{rst}'))
             else:
-                print(colorize(
-                    (
-                        '\n{red}Some subprocesses failed (non 0 exit statuses)'
-                        'Leaks tests failed.{rst}\n'
-                    )))
-            
+                print(colorize('{fail}Leaks found.{rst}'))
+        else:
+            print(colorize(
+                (
+                    '\n{red}Some subprocesses failed (non 0 exit statuses)'
+                    'Leaks tests failed.{rst}\n'
+                )))
+
     def run_in_subprocess(self, function, case):
         """
         This method run a test case by passing it to both f1 and f2,
@@ -274,18 +278,6 @@ if __name__ == '__main__':
                               'every test set result'))
     parser.add_argument('-u', '--uncolored', dest='colors',
                         action='store_false', help='disable colors.')
-    parser.add_argument('-c', '--cmp', action='store_true',
-                        help='Enable comparison tests. It will run every case '
-                        'in a child process.')
-    parser.add_argument('-a', '--all', action='store_true',
-                        help='Enable all (comparison+segfault+leaks) tests.')
-    parser.add_argument('-l', '--leaks', action='store_true',
-                        help=(
-                            'Enable leaks tests, it will run every case '
-                            'in the current process, then run an infinite loop'
-                            ' so you can run leaks. '
-                            'You\'ll have to ctrl+C to close the program.'
-                        ))
     parser.add_argument('filename',
                         help=(
                             'A valid python3 file containing an iterable '
@@ -339,12 +331,7 @@ if __name__ == '__main__':
     #                           Test sets defintion                           #
     # *********************************************************************** #
 
-    # all_tests = not (args.cmp or args.leaks or args.segv)
-    # cmp_sets = cases.cmp_sets if args.cmp or all_tests else None
-    # segv_set = cases.segv_set if args.segv or all_tests else None
-    # lks_set = cases.lks_set if args.leaks or all_tests else None
-
     print(args)
     t = Tester()
     t.run(cases_generator=cases_generator,
-          verbose=args.verbose, quiet=args.quiet, lks=args.leaks)
+          verbose=args.verbose, quiet=args.quiet)
