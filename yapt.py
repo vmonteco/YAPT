@@ -36,11 +36,11 @@ msgs = {
     'subset_res':
     '--- {res}%s{rst} results : [{res}%d{rst}/{grn}%d{rst}]. ---',
     'test_normal_res': (
-        '\r[case: #%s][{case}%r{rst}] -> [%s/%s]'
+        '[case: #%s][{case}%r{rst}] -> [%s/%s]'
         '[{grn}%d{rst}/{res1}%d{rst}][{grn}%r{rst}/{res2}%r{rst}].'
     ),
     'test_err': (
-        '\r[case: #%s][{case}%r{rst}] -> [%s/%s]'
+        '[case: #%s][{case}%r{rst}] -> [%s/%s]'
         '[{res1}%d{rst}/{res2}%d{rst}] ({res}%s{rst}).'
     ),
     'exit_err': '{fail}%s cases exited non zero statuses.{rst}'
@@ -67,13 +67,14 @@ class Tester:
             'local_exit_err': 0,
         }
 
-    def run(self, cases_generator=None, verbose=False, quiet=False):
+    def run(self, cases_generator=None, verbose=False, quiet=False,
+            debug=False):
         """
         This is the main run() method. It will (or not) trigger other
         run submethods.
         """
         print(colorize(self.msgs['welcome']))
-        self.run_cmp_cases(cases_generator(), verbose, quiet)
+        self.run_cmp_cases(cases_generator(), verbose, quiet, debug)
         if self.counters['global_exit_err'] == 0:
             print('Running cases in current process...')
             cases = cases_generator()
@@ -128,14 +129,15 @@ class Tester:
             res['status'] = os.waitpid(pid, 0)[1]
             return res
 
-    def run_cmp_cases(self, cases, verbose=False, quiet=False):
+    def run_cmp_cases(self, cases, verbose=False, quiet=False, debug=False):
         """
         This run submethod just run test sets by calling run_in_subprocess().
         """
         self.counters['global_tried'] = 0
         self.counters['global_success'] = 0
         for case in cases:
-            self.run_cmp_cases_subsets(case['name'], case, verbose, quiet)
+            self.run_cmp_cases_subsets(case['name'], case, verbose, quiet,
+                                       debug)
         if self.counters['global_tried'] > 0:
             success = self.counters['global_tried'] == self.counters[
                 'global_success'
@@ -154,7 +156,8 @@ class Tester:
                       self.counters['local_exit_err']
                   ))
 
-    def run_cmp_cases_subsets(self, name, cases, verbose=False, quiet=False):
+    def run_cmp_cases_subsets(self, name, cases, verbose=False, quiet=False,
+                              debug=False):
         """
         This run submethod just run test subsets by calling
         run_in_subprocess().
@@ -164,7 +167,7 @@ class Tester:
         self.counters['local_exit_err'] = 0
         print(colorize(self.msgs['subset_head'], {}) % (cases['name'],))
         for case in cases['cases']:
-            self.run_cmp_case(name, case, verbose, quiet)
+            self.run_cmp_case(name, case, verbose, quiet, debug)
         if self.counters['local_tried'] > 0:
             success = (
                 self.counters['local_tried'] == self.counters['local_success']
@@ -182,24 +185,31 @@ class Tester:
                           self.counters['local_exit_err']
                       ))
                 
-    def run_cmp_case(self, name, case, verbose=False, quiet=False):
+    def run_cmp_case(self, name, case, verbose=False, quiet=False, debug=False):
         """
         This method just runs an actual test by calling
         run_in_subprocess().
         """
+        if debug:
+            print("case : [%s] " % case, end='', file=sys.stderr)
+        f1 = self.run_in_subprocess(self.f1, case)
+        if debug:
+            print("f1 issued " % case, end='', file=sys.stderr)
+        f2 = self.run_in_subprocess(self.f2, case)
+        if debug:
+            print("f2 issued" % case, file=sys.stderr)
         res = {
-            'f1': self.run_in_subprocess(self.f1, case),
-            'f2': self.run_in_subprocess(self.f2, case),
+            'f1': f1,
+            'f2': f2
         }
         self.interpret_cmp_results(case, res, verbose, quiet)
-        if not quiet:
-            print('\rresults : local (%s) : [%s/%s], global : [%s/%s]' % (
-                name,
-                self.counters['local_tried'],
-                self.counters['local_success'],
-                self.counters['global_tried'],
-                self.counters['global_success']
-                ), end='')
+        print('results : local (%s) : [%s/%s], global : [%s/%s]' % (
+            name,
+            self.counters['local_success'],
+            self.counters['local_tried'],
+            self.counters['global_success'],
+            self.counters['global_tried']
+        ), end='\r')
         
     def interpret_cmp_results(self, case, res, verbose=False, quiet=False):
         """
@@ -286,6 +296,8 @@ if __name__ == '__main__':
                               'every test set result'))
     parser.add_argument('-u', '--uncolored', dest='colors',
                         action='store_false', help='disable colors.')
+    parser.add_argument('-d', '--debug', dest='debug',
+                        action='store_true', help='enable debug output.')
     parser.add_argument('filename',
                         help=(
                             'A valid python3 file containing an iterable '
@@ -342,4 +354,4 @@ if __name__ == '__main__':
     print(args)
     t = Tester()
     t.run(cases_generator=cases_generator,
-          verbose=args.verbose, quiet=args.quiet)
+          verbose=args.verbose, quiet=args.quiet, debug=args.debug)
