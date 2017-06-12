@@ -135,7 +135,7 @@ class Tester:
         self.counters['global_tried'] = 0
         self.counters['global_success'] = 0
         for case in cases:
-            self.run_cmp_cases_subsets(case, verbose, quiet)
+            self.run_cmp_cases_subsets(case['name'], case, verbose, quiet)
         if self.counters['global_tried'] > 0:
             success = self.counters['global_tried'] == self.counters[
                 'global_success'
@@ -154,7 +154,7 @@ class Tester:
                       self.counters['local_exit_err']
                   ))
 
-    def run_cmp_cases_subsets(self, cases, verbose=False, quiet=False):
+    def run_cmp_cases_subsets(self, name, cases, verbose=False, quiet=False):
         """
         This run submethod just run test subsets by calling
         run_in_subprocess().
@@ -164,7 +164,7 @@ class Tester:
         self.counters['local_exit_err'] = 0
         print(colorize(self.msgs['subset_head'], {}) % (cases['name'],))
         for case in cases['cases']:
-            self.run_cmp_case(case, verbose, quiet)
+            self.run_cmp_case(name, case, verbose, quiet)
         if self.counters['local_tried'] > 0:
             success = (
                 self.counters['local_tried'] == self.counters['local_success']
@@ -182,7 +182,7 @@ class Tester:
                           self.counters['local_exit_err']
                       ))
                 
-    def run_cmp_case(self, case, verbose=False, quiet=False):
+    def run_cmp_case(self, name, case, verbose=False, quiet=False):
         """
         This method just runs an actual test by calling
         run_in_subprocess().
@@ -193,7 +193,8 @@ class Tester:
         }
         self.interpret_cmp_results(case, res, verbose, quiet)
         if not quiet:
-            print('\rresults : local : [%s/%s], global : [%s/%s]' % (
+            print('\rresults : local (%s) : [%s/%s], global : [%s/%s]' % (
+                name,
                 self.counters['local_tried'],
                 self.counters['local_success'],
                 self.counters['global_tried'],
