@@ -8,7 +8,7 @@ import ctypes
 import ctypes.util
 import imp
 import importlib
-import cases
+import subprocess
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -57,7 +57,7 @@ class Tester:
 
     def __init__(self, f1=printf, f2=ft_printf):
         self.f1 = f1
-        self.f2 = f2
+        self.f2 = f2 # function to test
         self.counters = {
             "global_success": 0,
             "global_tried": 0,
@@ -74,15 +74,21 @@ class Tester:
         run submethods.
         """
         print(colorize(self.msgs['welcome']))
-        self.run_cmp_cases(cases(), verbose, quiet)
-        if lks_set and self.global_exit_err == 0:
-            print("\nYou can now run leaks. PID is %dctrl+C to terminate."
-                  % os.getpid())
-            while True:
-                pass
-        else:
-            print(colorize("\n{red}Some subprocesses failed (non 0 exit statuses).
-            Leaks tests failed.{rst}\n"))
+        self.run_cmp_cases(cases_generator(), verbose, quiet)
+        if lks:
+            if self.counters['global_exit_err'] == 0:
+                print("Running cases in current process...")
+                cases = cases_generator()
+                for s in cases:
+                    for c in s['cases']:
+                        self.f2(*s)
+                subprocess.call(['leaks', str(os.getpid())])
+            else:
+                print(colorize(
+                    (
+                        '\n{red}Some subprocesses failed (non 0 exit statuses)'
+                        'Leaks tests failed.{rst}\n'
+                    )))
             
     def run_in_subprocess(self, function, case):
         """
@@ -298,9 +304,9 @@ if __name__ == '__main__':
     if mod:
         try:
             m = imp.load_module('cases', *mod)
-            cases = cases.cases
         finally:
             mod[0].close()
+        cases_generator = m.cases_generator
 
     # *********************************************************************** #
     #                           Colors definition                             #
@@ -338,6 +344,7 @@ if __name__ == '__main__':
     # segv_set = cases.segv_set if args.segv or all_tests else None
     # lks_set = cases.lks_set if args.leaks or all_tests else None
 
+    print(args)
     t = Tester()
-    t.run(cases=cases,
+    t.run(cases_generator=cases_generator,
           verbose=args.verbose, quiet=args.quiet, lks=args.leaks)

@@ -130,7 +130,7 @@ sets_set = [
     ('U tests', b'U', pos_num_vals),
 ]
 
-def all_cases():
+def cases_generator():
 
     for s in sets_set:
 
@@ -146,7 +146,3 @@ def all_cases():
             'name' : s[0],
             'cases' : f(),
         })
-
-cases = all_cases()
-
-leaks_cases = all_cases()
