@@ -67,18 +67,22 @@ class Tester:
             "local_exit_err": 0,
         }
 
-    def run(self, cases=None, verbose=False,
+    def run(self, cases_generator=None, verbose=False,
             quiet=False, lks=False):
         """
         This is the main run() method. It will (or not) trigger other
         run submethods.
         """
         print(colorize(self.msgs['welcome']))
-        self.run_cmp_cases(cases, verbose, quiet)
-        # if segv_set:
-        #     self.run_segv_cases(segv_set, verbose, quiet)
-        while lks_set:
-            pass
+        self.run_cmp_cases(cases(), verbose, quiet)
+        if lks_set and self.global_exit_err == 0:
+            print("\nYou can now run leaks. PID is %dctrl+C to terminate."
+                  % os.getpid())
+            while True:
+                pass
+        else:
+            print(colorize("\n{red}Some subprocesses failed (non 0 exit statuses).
+            Leaks tests failed.{rst}\n"))
             
     def run_in_subprocess(self, function, case):
         """
@@ -139,7 +143,6 @@ class Tester:
                   % (
                       self.counters['local_exit_err']
                   ))
-
             
     def run_cmp_cases_subsets(self, cases, verbose=False, quiet=False):
         """
@@ -241,46 +244,6 @@ class Tester:
                  ))
         if m and not quiet:
             print(m)
-
-    def run_segv_cases(self, cases, verbose=False, quiet=False):
-        self.counters['global_tried'] = 0
-        self.counters['global_success'] = 0
-        for case in cases:
-            res = self.run_in_subprocess(self.f2, case)
-            self.interpret_segv_result(res, case, verbose)
-        self.print_segv_cases_result()
-
-    def interpret_segv_result(self, result, case, verbose=False, quiet=False):
-        self.counters['global_tried'] += 1
-        if result['status'] == 0:
-            self.counters['global_success'] += 1
-        if result['status'] != 0 or verbose:
-            res = colors['succ'] if result['status'] == 0 else colors['fail']
-            print(
-                colorize(self.msgs['segv_case_res'], {'res': res})
-                % (
-                    case,
-                    result['status']
-                )
-            )
-
-    def print_segv_cases_result(self):
-        succ = (
-            self.counters['global_tried'] == self.counters['global_success']
-        )
-        res = colors['succ'] if succ else colors['fail']
-        print(
-            colorize(self.msgs['segv_res'], {'res': res})
-            % (
-                self.counters['global_success'],
-                self.counters['global_tried']
-            ))
-
-    def run_lks_cases(self, cases, verbose=False, quiet=False):
-        print("Running cases to test leaks.")
-        for case in cases:
-            self.f2(*case)
-
 
 # *************************************************************************** #
 

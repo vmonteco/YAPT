@@ -149,9 +149,4 @@ def all_cases():
 
 cases = all_cases()
 
-segv_cases = [
-]
-
-segv_set = []
-
-lks_set = []
+leaks_cases = all_cases()
