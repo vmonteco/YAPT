@@ -36,11 +36,11 @@ msgs = {
     'subset_res':
     '--- {res}%s{rst} results : [{res}%d{rst}/{grn}%d{rst}]. ---',
     'test_normal_res': (
-        '[case: #%s][{case}%r{rst}] -> [%s/%s]'
+        '\r[case: #%s][{case}%r{rst}] -> [%s/%s]'
         '[{grn}%d{rst}/{res1}%d{rst}][{grn}%r{rst}/{res2}%r{rst}].'
     ),
     'test_err': (
-        '[case: #%s][{case}%r{rst}] -> [%s/%s]'
+        '\r[case: #%s][{case}%r{rst}] -> [%s/%s]'
         '[{res1}%d{rst}/{res2}%d{rst}] ({res}%s{rst}).'
     ),
     'exit_err': '{fail}%s cases exited non zero statuses.{rst}'
@@ -181,7 +181,7 @@ class Tester:
                       % (
                           self.counters['local_exit_err']
                       ))
-
+                
     def run_cmp_case(self, case, verbose=False, quiet=False):
         """
         This method just runs an actual test by calling
@@ -192,7 +192,14 @@ class Tester:
             'f2': self.run_in_subprocess(self.f2, case),
         }
         self.interpret_cmp_results(case, res, verbose, quiet)
-
+        if not quiet:
+            print('\rresults : local : [%s/%s], global : [%s/%s]' % (
+                self.counters['local_tried'],
+                self.counters['local_success'],
+                self.counters['global_tried'],
+                self.counters['global_success']
+                ), end='')
+        
     def interpret_cmp_results(self, case, res, verbose=False, quiet=False):
         """
         This method manges the display of the results for comparison tests.
