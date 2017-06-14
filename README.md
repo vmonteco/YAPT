@@ -39,7 +39,7 @@ Test subsets are dictionnaries formatted as bellow :
 
 Where *name* is a string containing a description of the subset, and cases an other iterable containing iterables (again) that will contain arguments to pass to the function for a specific case.
 
-These arguments must use the `ctypes` API. See the examples and https://docs.python.org/3.6/library/ctypes.html#fundamental-data-types for more informations.
+These arguments must use the `ctypes` API. See the examples and https://docs.python.org/3.6/library/ctypes.html#fundamental-data-types for more informations. Also strings must be byte strings (`b''`) and not regular python strings ('').
 
 So the `cases_generator` factory return could look like this :
 
@@ -99,3 +99,5 @@ There are two kinds of output you can get for a case :
 +. My English fluency.
 
 +. Your pythonic skills.
+
++. Norminet's manners.
