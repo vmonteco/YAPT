@@ -21,7 +21,7 @@ You can also find informations about YAPT features by running `./yapt -h`.
 
 ### How does it work?
 
-The programm forks and runs each case and for each function in a subprocess. The output is captured and piped to parent process, just like the return value.
+The programm forks and runs each case and each function to compare in a subprocess. The output is captured and piped to parent process, just like the return value.
 These values are then interpreted and compared. If the subprocess exits with an error, then the exit status is interpreted.
 
 If every exit status was 0, leaks are tested after running every previous case directly in the parent process.
@@ -75,6 +75,8 @@ There are two kinds of output you can get for a case :
 2. The child process does not exits normally :
 
        [case: #<case index>][<case>] -> [printf/ft_printf][<printf exit status or timeout>/<ft_printf exit status or timeout>] (different exit statuses.).
+
+Also note that if you doesn't enable the `-v` parameter, only the error outputs will be displayed. If you enable the `-q` parameter, only the subsets and global summaries are displayed.
 
 ### NB :
 
