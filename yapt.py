@@ -113,9 +113,13 @@ class Tester:
         if self.counters['global_exit_err'] == 0:
             print('Running cases in current process...')
             cases = cases_generator()
+            f = os.open('/dev/null', os.O_WRONLY)
+            os.dup2(f, sys.stdout.fileno())
             for s in cases:
                 for c in s['cases']:
-                    self.f2(*s)
+                    self.f2(*c)
+            os.close(f)
+            os.dup2(2, sys.stdout.fileno())
             l = subprocess.call(['leaks', str(os.getpid())])
             if l == 0:
                 print(colorize('{succ}No leaks found.{rst}'))
@@ -407,7 +411,6 @@ if __name__ == '__main__':
     #                           Test sets defintion                           #
     # *********************************************************************** #
 
-    print(args)
-    t = Tester()
+    t = Tester(printf, ft_printf)
     t.run(cases_generator=cases_generator,
           verbose=args.verbose, quiet=args.quiet, timeout=args.t)
