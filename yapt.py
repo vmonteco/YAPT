@@ -243,7 +243,8 @@ class Tester:
             res['status'] = 'timeout'
             os.close(pipes['output_w'])
             os.close(pipes['return_w'])
-            output_in = os.fdopen(pipes['output_r'], encoding='cp1252')
+            # output_in = os.fdopen(pipes['output_r'], encoding='cp1252')
+            output_in = os.fdopen(pipes['output_r'], mode='rb')#, encoding='utf8')
             return_in = os.fdopen(pipes['return_r'])
             try:
                 with Timeout(t=timeout) as t:
