@@ -21,5 +21,5 @@ def generator_comb_factory(test_sets):
 
 def generator_factory(test_sets):
     def f():
-        yield from (i for i in subset_generator_factory(test_sets))
+        yield from (i for i in test_sets)
     return f
