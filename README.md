@@ -1,6 +1,6 @@
-# `ft_printf_test` :
+# Yet Another Printf Tester (YAPT) :
 
-## Test suite for comparison between an homemade C printf (aka. `ft_printf` for duoquadragintians) and OSX's printf.
+## Test suite for comparison between an homemade C printf (aka. `ft_printf` for duoquadragintians) and OSX's printf written in Python 3.
 
 ### Introduction :
 
@@ -8,24 +8,29 @@ This test suite is a dummy test set intended to help 42 students (and hopefully 
 
 ### How to use :
 
-A Makefile is provided, after adding some path informations (for ft_printf to test and possible libft) :
+1. Link your project's path to `./ft_printf` in the YAPT directory.
 
-1. To just compile the test library `libtestftprintf` (Beware : Long compilating time) :
+2. Compile with `make`. It should compile your project and create a shared library (.so) in the YAPT directory.
+   This library will be used by ctype to call your ft_printf function.
+   
+3. Then just run the YAPT executable with one of the test files provided (or even your own test file) :
 
-    make
+    ./yapt test_files/dummy_cases.py
+
+### How are the test files formated :
+
+These Test files are python files (obviously).
+
+These files must be passed as parameters to the YAPT executable.
+
+These files must contain at least a `cases_generator` element. This element must be an iterable (generator, list...) that would contain *test subsets*.
+Test subsets will be dictionnaries formatted as bellow :
+
+    {'name': name, 'cases': cases}
 	
-2. To compile the library and the executable `testprintf` :
+Where *name* is a string containing a description of the subset, and cases an other iterable containing iterables (again) that will contain arguments to pass to the function for a specific case.
 
-    make testprintf
-	
-3. To compile and launch the tests :
-
-    make test
-	
-4. To compile and launch the tests in verbose mode (It will run the executable and display EVERY test output, even the successful ones) :
-
-	make vtest
-
+These arguments must use the `ctypes` API. See the examples
 
 ### What do these tests test and how :
 
