@@ -113,9 +113,8 @@ class Tester:
         if self.counters['global_exit_err'] == 0:
             print('Running cases in current process...')
             cases = cases_generator()
-            #f = os.open('/dev/null', os.O_WRONLY)
-            #os.dup2(f, sys.stdout.fileno())
-            os.dup2(sys.devnull.fileno(), sys.stdout.fileno())
+            f = os.open(os.devnull, os.O_WRONLY)
+            os.dup2(f, sys.stdout.fileno())
             for s in cases:
                 for c in s['cases']:
                     self.f2(*c)
