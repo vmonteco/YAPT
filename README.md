@@ -21,6 +21,11 @@ You can also find informations about YAPT features by running `./yapt -h`.
 
 ### How does it work?
 
+The programm forks and runs each case and for each function in a subprocess. The output is captured and piped to parent process, just like the return value.
+These values are then interpreted and compared. If the subprocess exits with an error, then the exit status is interpreted.
+
+If every exit status was 0, leaks are tested after running every previous case directly in the parent process.
+
 ### How are the test files formated :
 
 These Test files are python files (obviously).
@@ -53,13 +58,23 @@ So the `cases_generator` factory return could look like this :
 
 #### What tests are provided?
 
-+. full_cases.py : This test file gathers content from many others. 
++. full_cases.py : This test file gathers content from many others full tests that can be passed as well to yapt.py. These tests are generated combinatorially and there are a *lot* of cases.
 
-+. regular_tests.py :
++. regular_tests.py : Some tests that should be enough to check most of your ft_printf feature (but probably not all). It also gathers other regular test sets.
 
-+. dummy_tests.py
++. dummy_tests.py : Just a dummy test with 4 cases to check that the programm runs. It can be a first check to do before doing more advanced tests.
 
-### What do the output mean?
+### What does the output mean?
+
+There are two kinds of output you can get for a case :
+
+1. The child process exits normally (this does implies s successful test) :
+
+       [case: #<case index>][<case>] -> [printf/ft_printf][<printf return>/<ft_printf return>][b<printf output>/b<ft_printf output>].
+
+2. The child process does not exits normally :
+
+       [case: #<case index>][<case>] -> [printf/ft_printf][<printf exit status or timeout>/<ft_printf exit status or timeout>] (different exit statuses.).
 
 ### NB :
 
@@ -74,6 +89,8 @@ So the `cases_generator` factory return could look like this :
 ### What could be improved :
 
 +. More explicit error messages in case of child process failure.
+
++. Timeout and other errors detailed counting.
 
 +. Multiprocessing.
 

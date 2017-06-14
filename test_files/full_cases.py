@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 from tools.factories import generator_factory
-import test_files.percent_cases as percent_cases
-import test_files.c_cases as c_cases
+import test_files.percent_cases_full as percent_cases
+import test_files.c_cases_full as c_cases
 
 test_sets = (
     percent_cases.test_sets
