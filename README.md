@@ -17,53 +17,68 @@ This test suite is a dummy test set intended to help 42 students (and hopefully 
 
     ./yapt test_files/dummy_cases.py
 
+You can also find informations about YAPT features by running `./yapt -h`.
+
+### How does it work?
+
 ### How are the test files formated :
 
 These Test files are python files (obviously).
 
 These files must be passed as parameters to the YAPT executable.
 
-These files must contain at least a `cases_generator` element. This element must be an iterable (generator, list...) that would contain *test subsets*.
-Test subsets will be dictionnaries formatted as bellow :
+These files must contain at least a `cases_generator` element. This element must be an iterable (generator, list...) factory. Its return would contain *test subsets*.
+Test subsets are dictionnaries formatted as bellow :
 
     {'name': name, 'cases': cases}
-	
+
 Where *name* is a string containing a description of the subset, and cases an other iterable containing iterables (again) that will contain arguments to pass to the function for a specific case.
 
-These arguments must use the `ctypes` API. See the examples
+These arguments must use the `ctypes` API. See the examples and https://docs.python.org/3.6/library/ctypes.html#fundamental-data-types for more informations.
 
-### What do these tests test and how :
+So the `cases_generator` factory return could look like this :
 
-These tests run the two functions to compare in child processes, both the return value and the output on stdout are piped to the parent process and compared. If a difference appears in either the return values or the outputs, the test is considered as failed.
+    [
+	    {
+		    'name': string,
+			'cases': [
+				[arg1, arg2, arg3, ...],
+				...
+			]
+		},
+		...
+	]
 
-+. It will also display summaries for each handled conv specifier, and a global summary of passed tests at the end, expressed as ratios.
+`./test_files/dummy_cases.py` also contains a good example of how you could build your own tests.
 
-+. If a child process failed for some reason (for instance : segmentation fault), a simple error message is displayed (the test isn't considered as failed if both tested functions failed the same way).
+#### What tests are provided?
 
-+. This test suite basically tests every case `gcc` accepts with the flags `-Wall -Werror -Wextra` at compiling on OSX.
-   So it may also includes undefined behaviours, it also may not compile on other systems.
++. full_cases.py : This test file gathers content from many others. 
 
-+. So far, *13943* tests cases are tried. But if you think I've forgotten some, feel free to add your owns.
++. regular_tests.py :
 
-+. As previously stated, it does *not* test cases that aren't accepted by gcc on OSX.
++. dummy_tests.py
+
+### What do the output mean?
 
 ### NB :
 
 +. This test suite is meant to help students to realize the `ft_printf` project, not to permit them to make a "this-test-suite-fails-so-the-project-doesn't-work-so-here-is-your-0-bye-bye" correction :
 
-   As previously stated, this test suite includes undefined behaviours, check that a found error is a real erro   r before considering the project as failed. (Also, discuss the project, or you're a disgrace as an examiner).
+   This test suite includes undefined behaviours, check that a found error is a real error before considering the project as failed. (Also, discuss the project, or you're a disgrace as an examiner).
 
-+. */!\ This is a long test suite to compile : ~20min with every test /!\*
+### Also :
 
-   However, it's designed as a library to permit you to test again without having to recompile the whole thing.
-   But keep in mind that the whole tests will have to recompile if you adjust the test sets to run by commenting/uncommenting preprocessor directives in `ft_printf_test()` function.
++. This code is distributed under the <LICENCE>. Feel free to use it, fork it, copy it, share it, improve it, criticize it, reuse it, contribute with a PR, etc.
 
-### What improvement could be made :
-
-+. Adapting used tests to the current OS.
+### What could be improved :
 
 +. More explicit error messages in case of child process failure.
 
-+. More tests (if some are forgotten).
++. Multiprocessing.
 
-+. A specific way to mark undefined behaviours as undefined behaviour in output (And, therefore, sorting out tests by "defined" and "undefined" behaviour).
++. More/other tests.
+
++. My English fluency.
+
++. Your pythonic skills.
