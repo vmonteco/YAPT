@@ -13,11 +13,11 @@ test_sets = (
     + uc_cases.test_sets
     + s_cases.test_sets
     + us_cases.test_sets
-    + p_cases.test_sets#
-    + d_cases.test_sets#
-    + ud_cases.test_sets#
-    + i_cases.test_sets#
-    + o_cases.test_sets#
+    + p_cases.test_sets
+    + d_cases.test_sets
+    + ud_cases.test_sets
+    + i_cases.test_sets
+    + o_cases.test_sets
     + uo_cases.test_sets#
     + u_cases.test_sets#
     + uu_cases.test_sets#
