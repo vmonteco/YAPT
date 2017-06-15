@@ -37,8 +37,8 @@ char_vals = [
 ]
 wchar_vals = [
     [None],
-    [ctypes.c_wchar('a')],
-    [ctypes.c_wchar('\u262D')],
+    [ctypes.c_wchar(u'a')],
+    [ctypes.c_wchar(u'\u262D')],
 ]
 pointer_vals = [
     [None],
