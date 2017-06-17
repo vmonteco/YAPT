@@ -14,9 +14,6 @@ $(LIB_SO): $(LIB_A)
 $(LIB_A): FORCE
 	make -C $(FT_PRINTF_PATH) all
 
-test: lib
-	./ft_printf_test.py
-
 re: fclean all
 
 clean:
