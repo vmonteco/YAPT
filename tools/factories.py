@@ -13,7 +13,7 @@ def subset_comb_generator_factory(subset):
 
 def generator_comb_factory(test_sets):
     def f():
-        yield from ({'name': s[0], 'cases': subset_comb_generator_factory(s)} for s in test_sets)
+        yield from ({'name': s[0], 'cases': s[3](s)} for s in test_sets)
     return f
 
 # def subset_generator_factory(subset):
