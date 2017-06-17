@@ -86,7 +86,7 @@ Also note that if you doesn't enable the `-v` parameter, only the error outputs 
 
 ### Also :
 
-+. This code is distributed under the <LICENCE>. Feel free to use it, fork it, copy it, share it, improve it, criticize it, reuse it, contribute with a PR, etc.
++. This code is distributed under the GPL3 license terms. Feel free to use it, fork it, copy it, share it, improve it, criticize it, reuse it, contribute with a PR, etc.
 
 ### What could be improved :
 
