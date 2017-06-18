@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from tools.vals import char_vals as vals
 from tools.vals import char_vals, wchar_vals
 from tools.powerset import powerset
 from tools.elems import min_len, len_mod
