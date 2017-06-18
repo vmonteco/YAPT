@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from tools.vals import char_vals as vals
-from tools.elems import options, min_len, len_mod
+from tools.vals import char_vals, wchar_vals
+from tools.powerset import powerset
+from tools.elems import min_len, len_mod
 from tools.factories import generator_comb_factory
+
+options = [b''.join(list(i)) for i in powerset([b' ', b'+', b'-', b'#'])]
 
 def c_subset_comb_generator_factory(subset):
     yield from ([b''.join([b'%', opt, ml, lm, subset[1], b'\n']), *v]
@@ -13,7 +17,7 @@ def c_subset_comb_generator_factory(subset):
     )
 
 test_sets = [
-    ('char tests', b'c', vals, c_subset_comb_generator_factory),
+    ('char tests', b'c', char_vals + wchar_vals, c_subset_comb_generator_factory),
 ]
 
 cases_generator = generator_comb_factory(test_sets)

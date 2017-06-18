@@ -74,6 +74,7 @@ basic_cases = [
     [b'%lc\n', ctypes.c_wchar(u'\0')],
     [b'%zc\n', ctypes.c_wchar(u'\0')],
     [b'%jc\n', ctypes.c_wchar(u'\0')],
+    
     [b'%c\n', ctypes.c_wchar(u'\u262D')],
     [b'% c\n', ctypes.c_wchar(u'\u262D')],
     [b'%+c\n', ctypes.c_wchar(u'\u262D')],
@@ -91,9 +92,7 @@ basic_cases = [
 ]
 
 mixed_cases = [
-    #[b'% +0#-4.5hhc\n', ctypes.c_char(b'f')],
-    [b'%5.-3c\n', ctypes.c_char(b'f')],
-    [b'%-5.-3c\n', ctypes.c_char(b'f')],
+    [b'%2lc\n', ctypes.c_wchar(u'\u262D')],
 ]
 
 test_sets = [

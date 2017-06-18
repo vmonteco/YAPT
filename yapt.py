@@ -232,19 +232,21 @@ class Tester:
                     os.close(pipes['output_r'])
                     os.close(pipes['return_r'])
                     os.dup2(pipes['output_w'], sys.stdout.fileno())
-                    return_fd = os.fdopen(pipes['return_w'], 'w')
+                    return_fd = os.fdopen(pipes['return_w'], 'bw')
                     #signal.signal(signal.SIGTERM, lambda s, f: handle_timeout(return_fd))
                     ret = function(*case)
             except TimeoutError as e:
                 pass
             finally:
                 os.close(pipes['output_w'])
-                return_fd.write(str(ret))
+                return_fd.write(str(ret).encode('utf-8'))
                 return_fd.close()
-                sys.exit()
+            sys.exit()
         else:
             res = {}
             res['status'] = 'timeout'
+            res['output'] = ''
+            res['return'] = -1
             os.close(pipes['output_w'])
             os.close(pipes['return_w'])
             # output_in = os.fdopen(pipes['output_r'], encoding='cp1252')
@@ -252,9 +254,11 @@ class Tester:
             return_in = os.fdopen(pipes['return_r'])
             try:
                 with Timeout(t=timeout) as t:
-                    res['output'] = output_in.read()
-                    res['return'] = int(return_in.read())
                     res['status'] = os.waitpid(pid, 0)[1]
+                    if res['status'] == 0:
+                        res['output'] = output_in.read()
+                        tmp = return_in.read()
+                        res['return'] = int(tmp)
             except TimeoutError as e:
                 os.kill(pid, signal.SIGTERM)
                 os.waitpid(pid, 0)
