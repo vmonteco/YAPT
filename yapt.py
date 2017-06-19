@@ -122,7 +122,7 @@ class Tester:
             os.dup2(2, sys.stdout.fileno())
             l = subprocess.call(['leaks', str(os.getpid())])
             if l == 0:
-                print(colorize('{succ}No leaks found.{rst}'))
+                print(colorize('{succ}No leak found.{rst}'))
             elif l > 1:
                 print(colorize('{fail}An error occured with leaks.{rst}'))
             else:

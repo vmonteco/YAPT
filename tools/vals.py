@@ -52,6 +52,7 @@ str_vals = [
     [b'c'],
     [b'foo'],
 ]
+
 wstr_vals = [
     [None],
     [ctypes.c_wchar_p(u'')],

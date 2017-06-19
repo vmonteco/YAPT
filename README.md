@@ -39,7 +39,7 @@ Test subsets are dictionnaries formatted as bellow :
 
 Where *name* is a string containing a description of the subset, and cases an other iterable containing iterables (again) that will contain arguments to pass to the function for a specific case.
 
-These arguments must use the `ctypes` API. See the examples and https://docs.python.org/3.6/library/ctypes.html#fundamental-data-types for more informations. Also strings must be byte strings (`b''`) and not regular python strings ('').
+These arguments must use the `ctypes` API. See the examples and [ctypes documentation][1] for more informations. Also strings must be byte strings (`b''`) and not regular python strings ('').
 
 So the `cases_generator` factory return could look like this :
 
@@ -82,7 +82,7 @@ Also note that if you doesn't enable the `-v` parameter, only the error outputs 
 
 +. This test suite is meant to help students to realize the `ft_printf` project, not to permit them to make a "this-test-suite-fails-so-the-project-doesn't-work-so-here-is-your-0-bye-bye" correction :
 
-   This test suite includes undefined behaviours, check that a found error is a real error before considering the project as failed. (Also, discuss the project, or you're a disgrace as an examiner).
+   This test suite includes undefined behaviours, check that a found error is a real error before considering the project as failed. (Also, discuss the project, or you're a disgrace as an examiner). Since the man can be incomplete, you can refer to [the standard][2] to check if a case is supposed to invoke a defined behaviour or not.
 
 ### Also :
 
@@ -103,3 +103,6 @@ Also note that if you doesn't enable the `-v` parameter, only the error outputs 
 +. Your pythonic skills.
 
 +. Norminet's manners.
+
+[1]: https://7chan.org/pr/src/Violent_Python_A_Cookbook_for_Hackers_Forensic_Ana.pdf
+[2]: http://www.iso-9899.info/n1570.html#7.21.6.1

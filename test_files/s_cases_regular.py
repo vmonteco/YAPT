@@ -50,6 +50,8 @@ basic_cases = [
 
 mixed_cases = [
     [b'% +0#-4.5hhs', b'foo'],
+    [b'%1s\n', b'foo'],
+    [b'%.4s\n', b'foo'],
 ]
 
 test_sets = [
