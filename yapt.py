@@ -68,7 +68,9 @@ msgs = {
     'segv_case_res': '[{case}%r{rst}] -> [status : {res}%s{rst}]',
     'subset_head': '*** Running "{grn}%s{rst}" tests. ***',
     'subset_res':
-    '--- {res}%s{rst} results : [{res}%d{rst}/{grn}%d{rst}]. ---',
+    (
+        '--- {res}%s{rst} results : [{res}%d{rst}/{grn}%d{rst}]. ---'
+    ),
     'test_normal_res': (
         '[case: #%s][{case}%r{rst}] -> [%s/%s]'
         '[{grn}%d{rst}/{res1}%d{rst}][{grn}%r{rst}/{res2}%r{rst}].'

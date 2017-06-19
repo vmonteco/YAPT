@@ -82,7 +82,7 @@ Also note that if you doesn't enable the `-v` parameter, only the error outputs 
 
 +. This test suite is meant to help students to realize the `ft_printf` project, not to permit them to make a "this-test-suite-fails-so-the-project-doesn't-work-so-here-is-your-0-bye-bye" correction :
 
-   This test suite includes undefined behaviours, check that a found error is a real error before considering the project as failed. (Also, discuss the project, or you're a disgrace as an examiner). Since the man can be incomplete, you can refer to [the standard][2] to check if a case is supposed to invoke a defined behaviour or not.
+   This test suite includes undefined behaviours, check that a found error is a real error before considering the project as failed. (Also, discuss the project, or you're a disgrace as an examiner). Since the man can be incomplete, you can also refer to [the standard][2] to check if a case is supposed to invoke a defined behaviour or not.
 
 ### Also :
 
