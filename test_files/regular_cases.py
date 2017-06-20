@@ -16,6 +16,8 @@ import test_files.u_cases_regular as u_cases
 import test_files.uu_cases_regular as uu_cases
 import test_files.x_cases_regular as x_cases
 import test_files.ux_cases_regular as ux_cases
+import test_files.ux_cases_regular as ux_cases
+import test_files.misc_regular as misc_cases
 
 test_sets = (
     percent_cases.test_sets
@@ -33,6 +35,7 @@ test_sets = (
     + uu_cases.test_sets
     + x_cases.test_sets
     + ux_cases.test_sets
+    + misc_cases.test_sets
 )
 
 

@@ -5,9 +5,11 @@ LIB_SO=libftprintf.so
 PY_TEST=./ft_printf_test.py
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
-	FLAGS=--whole-archive
+	FLAGS=-Wl,--whole-archive
+	CLOSING=-Wl,--no-whole-archive
 else
-	FLAGS=-all_load
+	FLAGS=-Wl-all_load
+	CLOSING=
 endif
 
 all: lib
@@ -15,7 +17,7 @@ all: lib
 lib: $(LIB_SO)
 
 $(LIB_SO): $(LIB_A)
-	gcc -shared -o $@ -Wl,$(FLAGS) $<
+	gcc -shared -o $@ $(FLAGS) $< $(CLOSING)
 
 $(LIB_A): FORCE
 	make -C $(FT_PRINTF_PATH) all

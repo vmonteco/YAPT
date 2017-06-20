@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from tools.vals import char_vals, wchar_vals
+from tools.vals import wchar_vals as vals
 from tools.powerset import powerset
 from tools.elems import min_len, len_mod
 from tools.factories import generator_comb_factory, subset_comb_generator_factory
@@ -16,7 +16,7 @@ def uc_subset_comb_generator_factory(subset):
     )
 
 test_sets = [
-    ('wide char tests', b'C', char_vals + wchar_vals, uc_subset_comb_generator_factory),
+    ('wide char tests', b'C', vals, uc_subset_comb_generator_factory),
 ]
 
 cases_generator = generator_comb_factory(test_sets)

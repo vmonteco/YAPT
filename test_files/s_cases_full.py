@@ -9,7 +9,7 @@ def s_subset_comb_generator_factory(subset):
                 for opt in options
                 for p in precision
                 for ml in min_len
-                for lm in len_mod if lm != b'l'
+                for lm in len_mod if lm != b'l' and lm != b'll' and lm != b'j'
                 for v in subset[2])
 
 def wide_s_subset_comb_generator_factory(subset):
