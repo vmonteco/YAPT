@@ -27,11 +27,11 @@ basic_cases = [
     [b'%10c\n', ctypes.c_byte(-1)],
     [b'%.5c\n', ctypes.c_byte(-1)],
     [b'%hhc\n', ctypes.c_byte(-1)],
-    #[b'%llc\n', ctypes.c_byte(-1)],
+    [b'%llc\n', ctypes.c_byte(-1)],
     [b'%hc\n', ctypes.c_byte(-1)],
     #[b'%lc\n', ctypes.c_byte(-1)],
     [b'%zc\n', ctypes.c_byte(-1)],
-    #[b'%jc\n', ctypes.c_byte(-1)],
+    [b'%jc\n', ctypes.c_byte(-1)],
     [b'%c\n', ctypes.c_wchar(u'f')],
     [b'% c\n', ctypes.c_wchar(u'f')],
     [b'%+c\n', ctypes.c_wchar(u'f')],
@@ -84,11 +84,11 @@ basic_cases = [
     [b'%10c\n', ctypes.c_wchar(u'\u262D')],
     [b'%.5c\n', ctypes.c_wchar(u'\u262D')],
     [b'%hhc\n', ctypes.c_wchar(u'\u262D')],
-    #[b'%llc\n', ctypes.c_wchar(u'\u262D')],
+    [b'%llc\n', ctypes.c_wchar(u'\u262D')],
     [b'%hc\n', ctypes.c_wchar(u'\u262D')],
     [b'%lc\n', ctypes.c_wchar(u'\u262D')],
     [b'%zc\n', ctypes.c_wchar(u'\u262D')],
-    #[b'%jc\n', ctypes.c_wchar(u'\u262D')],
+    [b'%jc\n', ctypes.c_wchar(u'\u262D')],
 ]
 
 mixed_cases = [

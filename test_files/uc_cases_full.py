@@ -16,7 +16,7 @@ def uc_subset_comb_generator_factory(subset):
     )
 
 test_sets = [
-    ('wide char tests', b'C', vals, uc_subset_comb_generator_factory),
+    ('wide char tests (C)', b'C', vals, uc_subset_comb_generator_factory),
 ]
 
 cases_generator = generator_comb_factory(test_sets)

@@ -21,7 +21,7 @@ def wide_s_subset_comb_generator_factory(subset):
     
 test_sets = [
     ('string tests', b's', str_vals, s_subset_comb_generator_factory),
-    ('wide chars string tests', b's', wstr_vals, wide_s_subset_comb_generator_factory),
+    ('wide chars string tests (ls)', b's', wstr_vals, wide_s_subset_comb_generator_factory),
 ]
 
 cases_generator = generator_comb_factory(test_sets)

@@ -8,7 +8,7 @@ ifeq ($(UNAME_S),Linux)
 	FLAGS=-Wl,--whole-archive
 	CLOSING=-Wl,--no-whole-archive
 else
-	FLAGS=-Wl-all_load
+	FLAGS=-Wl,-all_load
 	CLOSING=
 endif
 

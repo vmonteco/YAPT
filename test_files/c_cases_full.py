@@ -32,7 +32,7 @@ def wide_c_subset_comb_generator_factory(subset):
     
 test_sets = [
     ('char tests', b'c', char_vals, c_subset_comb_generator_factory),
-    ('wide char tests', b'c', wchar_vals, wide_c_subset_comb_generator_factory),
+    ('wide char tests (lc)', b'c', wchar_vals, wide_c_subset_comb_generator_factory),
 ]
 
 cases_generator = generator_comb_factory(test_sets)
