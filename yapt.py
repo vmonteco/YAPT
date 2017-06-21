@@ -11,6 +11,8 @@ import importlib
 import signal
 import time
 import subprocess
+import functools
+import multiprocessing
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -47,7 +49,6 @@ class Timeout:
         if self.t != 0:
             signal.signal(signal.SIGALRM, self.handle_timeout)
             signal.setitimer(signal.ITIMER_REAL, self.t)
-            #signal.alarm(self.t)
 
     def __exit__(self, type, value, traceback):
         signal.alarm(0)
@@ -88,12 +89,16 @@ msgs = {
 
 
 class Tester:
-
+    
     msgs = msgs
 
-    def __init__(self, f1=printf, f2=ft_printf):
+    def __init__(self, f1=printf, f2=ft_printf, workers=1):
         self.f1 = f1
         self.f2 = f2  # function to test
+        if workers > 1:
+            self.p = multiprocessing.Pool(workers)
+        else:
+            self.p = None
         self.counters = {
             'global_success': 0,
             'global_tried': 0,
@@ -110,8 +115,7 @@ class Tester:
         run submethods.
         """
         print(colorize(self.msgs['welcome']))
-        self.run_cmp_cases(cases_generator(), verbose=verbose, quiet=quiet,
-                           timeout=timeout)
+        self.run_cmp_cases(cases_generator(), verbose=verbose, quiet=quiet, timeout=timeout)
         if self.counters['global_exit_err'] == 0:
             print('Running cases in current process...')
             cases = cases_generator()
@@ -174,9 +178,28 @@ class Tester:
         self.counters['local_success'] = 0
         self.counters['local_exit_err'] = 0
         print(colorize(self.msgs['subset_head'], {}) % (cases['name'],))
-        for case in cases['cases']:
-            self.run_cmp_case(name, case, verbose=verbose, quiet=quiet,
-                              timeout=timeout)
+        if self.p:
+            f = functools.partial(self.run_cmp_case, timeout=timeout)
+            for res in self.p.map(f, cases['cases']):
+                self.interpret_cmp_results(case, res, verbose=verbose, quiet=quiet)
+                print('results : local (%s) : [%s/%s], global : [%s/%s]' % (
+                    name,
+                    self.counters['local_success'],
+                    self.counters['local_tried'],
+                    self.counters['global_success'],
+                    self.counters['global_tried']
+                ), end='\r')                
+        else:
+            for case in cases['cases']:
+                res = self.run_cmp_case(case, timeout)
+                self.interpret_cmp_results(case, res, verbose, quiet)
+                print('results : local (%s) : [%s/%s], global : [%s/%s]' % (
+                    name,
+                    self.counters['local_success'],
+                    self.counters['local_tried'],
+                    self.counters['global_success'],
+                    self.counters['global_tried']
+                ), end='\r')
         if self.counters['local_tried'] > 0:
             success = (
                 self.counters['local_tried'] == self.counters['local_success']
@@ -195,8 +218,7 @@ class Tester:
                       ))
 
                 
-    def run_cmp_case(self, name, case, verbose=False, quiet=False,
-                     timeout=0.15):
+    def run_cmp_case(self, case, timeout=0.15):
         """
         This method just runs an actual test by calling
         run_in_subprocess().
@@ -205,15 +227,7 @@ class Tester:
             'f1': self.run_in_fork(self.f1, case, timeout=timeout),
             'f2': self.run_in_fork(self.f2, case, timeout=timeout)
         }
-        self.interpret_cmp_results(case, res, verbose, quiet)
-        print('results : local (%s) : [%s/%s], global : [%s/%s]' % (
-            name,
-            self.counters['local_success'],
-            self.counters['local_tried'],
-            self.counters['global_success'],
-            self.counters['global_tried']
-        ), end='\r')
-
+        return res
                 
     def run_in_fork(self, function, case, timeout=0.15):
         """
@@ -226,9 +240,9 @@ class Tester:
         pipes['output_r'], pipes['output_w'] = os.pipe()
         pipes['return_r'], pipes['return_w'] = os.pipe()
         pid = os.fork()
-        if (pid < 0):
+        if pid < 0:
             raise Exception('unable to fork')
-        elif (pid == 0):
+        elif pid == 0:
             try:
                 with Timeout(t=5) as t:
                     os.close(pipes['output_r'])
@@ -361,6 +375,13 @@ if __name__ == '__main__':
                             ' subprocess if the parent process can\'t kill'
                             'it in case of timeout).'
                         ))
+    parser.add_argument('-w', '--workers', dest='workers',
+                         type=int, default=1,
+                        help=(
+                            'Enables multiprocessing with the passed number'
+                            ' of workers. But passing 0 or 1 disables it.'
+                            ' Negative entries cause an error.'
+                        ))
     parser.add_argument('filename',
                         help=(
                             'A valid python3 file containing a generator '
@@ -370,53 +391,59 @@ if __name__ == '__main__':
                             '\'name\' entry to describe the cases subset, and'
                             ' a \'cases\' entry '
                         ))
-    args = parser.parse_args()
+    
+    try:
+        args = parser.parse_args()
+        if args.workers < 0:
+            raise ValueError('No negative worker number allowed')
+        
+        # ******************************************************************* #
+        #                           importing cases                           #
+        # ******************************************************************* #
 
-    # *********************************************************************** #
-    #                           importing cases                               #
-    # *********************************************************************** #
+        dir = os.path.dirname(os.path.abspath(args.filename))
+        f = os.path.basename(os.path.abspath(args.filename))
+        mod = imp.find_module(os.path.splitext(f)[0], [dir])
+        if mod:
+            try:
+                m = imp.load_module('cases', *mod)
+            finally:
+                mod[0].close()
+                cases_generator = m.cases_generator
+                
+        # ******************************************************************* #
+        #                           Colors definition                         #
+        # ******************************************************************* #
 
-    dir = os.path.dirname(os.path.abspath(args.filename))
-    f = os.path.basename(os.path.abspath(args.filename))
-    mod = imp.find_module(os.path.splitext(f)[0], [dir])
-    if mod:
-        try:
-            m = imp.load_module('cases', *mod)
-        finally:
-            mod[0].close()
-        cases_generator = m.cases_generator
+        def colored(s):
+            return (s if args.colors else '')
+        
+        colors = {
+            'red': colored('\033[91m'),
+            'cyan': colored('\033[96m'),
+            'blue': colored('\033[94m'),
+            'prpl': colored('\033[95m'),
+            'grn': colored('\033[92m'),
+            'yllw': colored('\033[93m'),
+            'rst': colored('\033[0m'),
+        }
 
-    # *********************************************************************** #
-    #                           Colors definition                             #
-    # *********************************************************************** #
+        colors['succ'] = colors['grn']
+        colors['fail'] = colors['red']
+        colors['case'] = colors['prpl']
+        colors['ntrl'] = colors['yllw']
+        
+        def colorize(s, res={}):
+            cols = colors
+            cols.update(res)
+            return (s.format(**cols))
 
-    def colored(s):
-        return (s if args.colors else '')
+        # ******************************************************************* #
+        #                         Test sets defintion                         #
+        # ******************************************************************* #
 
-    colors = {
-        'red': colored('\033[91m'),
-        'cyan': colored('\033[96m'),
-        'blue': colored('\033[94m'),
-        'prpl': colored('\033[95m'),
-        'grn': colored('\033[92m'),
-        'yllw': colored('\033[93m'),
-        'rst': colored('\033[0m'),
-    }
-
-    colors['succ'] = colors['grn']
-    colors['fail'] = colors['red']
-    colors['case'] = colors['prpl']
-    colors['ntrl'] = colors['yllw']
-
-    def colorize(s, res={}):
-        cols = colors
-        cols.update(res)
-        return (s.format(**cols))
-
-    # *********************************************************************** #
-    #                           Test sets defintion                           #
-    # *********************************************************************** #
-
-    t = Tester(printf, ft_printf)
-    t.run(cases_generator=cases_generator,
-          verbose=args.verbose, quiet=args.quiet, timeout=args.t)
+        t = Tester(printf, ft_printf, workers=args.workers)
+        t.run(cases_generator=cases_generator,
+              verbose=args.verbose, quiet=args.quiet, timeout=args.t)
+    except ValueError as e:
+        print(e)
