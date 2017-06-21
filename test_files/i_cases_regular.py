@@ -22,16 +22,17 @@ basic_cases = [
 
 
 mixed_cases = [
-    [b'% 0+-#10.5lld', ctypes.c_int(42)],
+    [b'% 0+-#10.5lli', ctypes.c_int(42)],
+    [b'%-010zi\\n', ctypes.c_short(0)],
 ]
 
 test_sets = [
     {
-        'name': 'd tests - basics.',
+        'name': 'i tests - basics.',
         'cases': basic_cases
     },
     {
-        'name': 'd tests - basics.',
+        'name': 'i tests - basics.',
         'cases': mixed_cases
     }
 ]
