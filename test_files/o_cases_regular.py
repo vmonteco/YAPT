@@ -22,7 +22,13 @@ basic_cases = [
 
 
 mixed_cases = [
-    [b'% 0+-#10.5llo', ctypes.c_int(42)],
+    [b'%#10.10o\n', ctypes.c_short(0)],
+    [b'%#1.o\n', ctypes.c_short(0)],
+    [b'%#.o\n', ctypes.c_char(b'\xff')],
+    [b'%#.0o\n', ctypes.c_char(b'\xff')],
+    [b'%#.1o\n', ctypes.c_char(b'\xff')],
+    [b'%#.1o\n', ctypes.c_short(0)],
+    [b'% 0+-#10.5llo\n', ctypes.c_int(42)],
 ]
 
 test_sets = [
