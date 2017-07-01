@@ -22,6 +22,7 @@ basic_cases = [
 
 
 mixed_cases = [
+    [b'%-02D\\n', ctypes.c_short(0)],
     [b'% 0+-#10.5llD', ctypes.c_long(42)],
 ]
 

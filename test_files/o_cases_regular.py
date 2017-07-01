@@ -28,7 +28,7 @@ mixed_cases = [
     [b'%#.0o\n', ctypes.c_char(b'\xff')],
     [b'%#.1o\n', ctypes.c_char(b'\xff')],
     [b'%#.1o\n', ctypes.c_short(0)],
-    [b'%#.2o\\n', ctypes.c_short(0)],
+    [b'%#.2o\n', ctypes.c_short(0)],
     [b'% 0+-#10.5llo\n', ctypes.c_int(42)],
 ]
 
