@@ -20,14 +20,9 @@ mouli_1_cases = [
 
 mouli_2_cases = [
     [b'%*.*d', ctypes.c_int(0), ctypes.c_int(3), ctypes.c_int(0)],
-    [b'%*.3d', ctypes.c_int(0), ctypes.c_int(0)],
-    
 ]
 
 mouli_3_cases = [
-    [b'{%3*d}', ctypes.c_int(0), ctypes.c_int(0)],
-    [b'{%*3d}', ctypes.c_int(0), ctypes.c_int(0)],
-    [b'{%*3d}', ctypes.c_int(5), ctypes.c_int(0)],
     [b'{%05.*d}', ctypes.c_int(-15), ctypes.c_int(42)],
 ]
 
@@ -39,7 +34,11 @@ test_sets = [
     {
         'name': 'moulitest\'s wildcard cases : bonus 2',
         'cases': mouli_2_cases,
-    }
+    },
+    {
+        'name': 'moulitest\'s wildcard cases : bonus 3',
+        'cases': mouli_3_cases,
+    },
 ]
 
 cases_generator = generator_factory(test_sets)
