@@ -16,11 +16,12 @@ mouli_1_cases = [
     [b'{%*s}', ctypes.c_int(-5), b'42'],
     [b'{%*s}', ctypes.c_int(0), b'42'],
     [b'{%*s}', ctypes.c_int(5), ctypes.c_int(0)],
-    [b'{%3*p}', ctypes.c_int(10), ctypes.c_int(0)],
 ]
 
 mouli_2_cases = [
     [b'%*.*d', ctypes.c_int(0), ctypes.c_int(3), ctypes.c_int(0)],
+    [b'%*.3d', ctypes.c_int(0), ctypes.c_int(0)],
+    
 ]
 
 mouli_3_cases = [
