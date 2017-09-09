@@ -92,6 +92,8 @@ Also note that if you doesn't enable the `-v` parameter, only the error outputs 
 
 ### What could be improved :
 
+* This `README.md`.
+
 * More explicit error messages in case of child process failure.
 
 * Timeout and other errors detailed counting.
