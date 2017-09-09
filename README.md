@@ -60,11 +60,11 @@ So the `cases_generator` factory return could look like this :
 
 #### What tests are provided?
 
-+. full_cases.py : This test file gathers content from many others full tests that can be passed as well to yapt.py. These tests are generated combinatorially and there are a *lot* of cases.
+* full_cases.py : This test file gathers content from many others full tests that can be passed as well to yapt.py. These tests are generated combinatorially and there are a *lot* of cases.
 
-+. regular_tests.py : Some tests that should be enough to check most of your ft_printf feature (but probably not all). It also gathers other regular test sets.
+* regular_tests.py : Some tests that should be enough to check most of your ft_printf feature (but probably not all). It also gathers other regular test sets.
 
-+. dummy_tests.py : Just a dummy test with 4 cases to check that the programm runs. It can be a first check to do before doing more advanced tests.
+* dummy_tests.py : Just a dummy test with 4 cases to check that the programm runs. It can be a first check to do before doing more advanced tests.
 
 ### What does the output mean?
 
@@ -82,29 +82,29 @@ Also note that if you doesn't enable the `-v` parameter, only the error outputs 
 
 ### NB :
 
-+. This test suite is meant to help students to realize the `ft_printf` project, not to permit them to make a "this-test-suite-fails-so-the-project-doesn't-work-so-here-is-your-0-bye-bye" correction :
+* This test suite is meant to help students to realize the `ft_printf` project, not to permit them to make a "this-test-suite-fails-so-the-project-doesn't-work-so-here-is-your-0-bye-bye" correction :
 
    This test suite includes undefined behaviours, check that a found error is a real error before considering the project as failed. (Also, discuss the project, or you're a disgrace as an examiner). Since the man can be incomplete, you can also refer to [the standard][2] to check if a case is supposed to invoke a defined behaviour or not.
 
 ### Also :
 
-+. This code is distributed under the GPL3 license terms. Feel free to use it, fork it, copy it, share it, improve it, criticize it, reuse it, contribute with a PR, etc.
+* This code is distributed under the GPL3 license terms. Feel free to use it, fork it, copy it, share it, improve it, criticize it, reuse it, contribute with a PR, etc.
 
 ### What could be improved :
 
-+. More explicit error messages in case of child process failure.
+* More explicit error messages in case of child process failure.
 
-+. Timeout and other errors detailed counting.
+* Timeout and other errors detailed counting.
 
-+. Multiprocessing.
+* Multiprocessing.
 
-+. More/other tests.
+* More/other tests.
 
-+. My English fluency.
+* My English fluency.
 
-+. Your pythonic skills.
+* Your pythonic skills.
 
-+. Norminet's manners.
+* Norminet's manners.
 
 [1]: https://7chan.org/pr/src/Violent_Python_A_Cookbook_for_Hackers_Forensic_Ana.pdf
 [2]: http://www.iso-9899.info/n1570.html#7.21.6.1
