@@ -8,7 +8,9 @@ This test suite is a dummy test set intended to help 42 students (and hopefully 
 
 ### How to use :
 
-1. Link your project's path to `./ft_printf` in the YAPT directory.
+1. Link your project's path to `./ft_printf` in the YAPT directory :
+
+   `ln -s /path/to/your/ft_printf ft_printf`
 
 2. Compile with `make`. It should compile your project and create a shared library (.so) in the YAPT directory.
    This library will be used by ctype to call your ft_printf function.
