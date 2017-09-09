@@ -80,6 +80,10 @@ There are two kinds of output you can get for a case :
 
 Also note that if you doesn't enable the `-v` parameter, only the error outputs will be displayed. If you enable the `-q` parameter, only the subsets and global summaries are displayed.
 
+Here is what you can get :
+
+![Output example](/images/logo.png)
+
 ### NB :
 
 * This test suite is meant to help students to realize the `ft_printf` project, not to permit them to make a "this-test-suite-fails-so-the-project-doesn't-work-so-here-is-your-0-bye-bye" correction :
