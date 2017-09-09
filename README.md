@@ -82,7 +82,7 @@ Also note that if you doesn't enable the `-v` parameter, only the error outputs 
 
 Here is what you can get :
 
-![Output example](/images/logo.png)
+![Output example](/vmonteco/YAPT/blob/master/2.0.png)
 
 ### NB :
 
