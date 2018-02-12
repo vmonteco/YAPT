@@ -8,6 +8,8 @@ This test suite is a dummy test set intended to help 42 students (and hopefully 
 
 ### How to use :
 
+0. Ensure you at least have `Python3.6` (`brew install python3` should do the trick).
+
 1. Link your project's path to `./ft_printf` in the YAPT directory :
 
    `ln -s /path/to/your/ft_printf ft_printf`

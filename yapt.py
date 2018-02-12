@@ -342,7 +342,7 @@ if __name__ == '__main__':
     # *********************************************************************** #    
 
     try:
-        assert sys.version_info >= (3,5)
+        assert sys.version_info >= (3,6)
     except AssertionError as e:
         print("Wrong version : Python >= 3.6 required")
         sys.exit(1)
