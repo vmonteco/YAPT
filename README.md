@@ -15,11 +15,11 @@ This test suite is a dummy test set intended to help 42 students (and hopefully 
    `ln -s /path/to/your/ft_printf ft_printf`
 
 2. Run `make`. It should compile your project and create a shared library (.so) in the YAPT directory.
-   This library will be used by ctype to call your ft_printf function.
+   This library will be used by `ctype` to call your `ft_printf` function.
    
 3. Then just run the YAPT executable with one of the test files provided (or even your own test file) :
 
-    ./yapt test_files/dummy_cases.py
+    ./yapt.py test_files/dummy_cases.py
 
 You can also find informations about YAPT features by running `./yapt -h`.
 
