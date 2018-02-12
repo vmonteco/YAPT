@@ -6,8 +6,7 @@ import sys
 import argparse
 import ctypes
 import ctypes.util
-import imp
-import importlib
+from importlib.machinery import SourceFileLoader
 import signal
 import time
 import subprocess
@@ -339,6 +338,16 @@ class Tester:
 if __name__ == '__main__':
 
     # *********************************************************************** #
+    #                          Check Python version                           #
+    # *********************************************************************** #    
+
+    try:
+        assert sys.version_info >= (3,5)
+    except AssertionError as e:
+        print("Wrong version : Python >= 3.6 required")
+        sys.exit(1)
+    
+    # *********************************************************************** #
     #                       Argument parser definition                        #
     # *********************************************************************** #
 
@@ -376,16 +385,10 @@ if __name__ == '__main__':
     #                           importing cases                               #
     # *********************************************************************** #
 
-    dir = os.path.dirname(os.path.abspath(args.filename))
-    f = os.path.basename(os.path.abspath(args.filename))
-    mod = imp.find_module(os.path.splitext(f)[0], [dir])
-    if mod:
-        try:
-            m = imp.load_module('cases', *mod)
-        finally:
-            mod[0].close()
-        cases_generator = m.cases_generator
 
+    m = SourceFileLoader("module.name", os.path.abspath(args.filename)).load_module()
+    cases_generator = m.cases_generator
+    
     # *********************************************************************** #
     #                           Colors definition                             #
     # *********************************************************************** #
