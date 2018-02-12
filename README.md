@@ -102,6 +102,8 @@ Here is what you can get :
 
 * More explicit error messages in case of child process failure.
 
+* Support for older Python versions.
+
 * Timeout and other errors detailed counting.
 
 * Multiprocessing.
