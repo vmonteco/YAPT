@@ -6,7 +6,6 @@ import sys
 import argparse
 import ctypes
 import ctypes.util
-from importlib.machinery import SourceFileLoader
 import signal
 import time
 import subprocess
@@ -341,11 +340,11 @@ if __name__ == '__main__':
     #                          Check Python version                           #
     # *********************************************************************** #    
 
-    try:
-        assert sys.version_info >= (3,6)
-    except AssertionError as e:
-        print("Wrong version : Python >= 3.6 required")
-        sys.exit(1)
+    # try:
+    #     assert sys.version_info >= (3,6)
+    # except AssertionError as e:
+    #     print("Wrong version : Python >= 3.6 required")
+    #     sys.exit(1)
     
     # *********************************************************************** #
     #                       Argument parser definition                        #
@@ -385,8 +384,24 @@ if __name__ == '__main__':
     #                           importing cases                               #
     # *********************************************************************** #
 
-
-    m = SourceFileLoader("module.name", os.path.abspath(args.filename)).load_module()
+    version = (sys.version_info.major, sys.version_info.minor)
+    if (version == (3, 4)):
+        print("Python version not supported (<3.5)")
+        sys.exit(1)
+    elif (version == (3, 5)):
+        import importlib.util
+        spec = importlib.util.spec_from_file_location(
+            "module.name", os.path.abspath(args.filename))
+        m = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(m)
+    elif (version >= (3, 6)):
+        from importlib.machinery import SourceFileLoader
+        m = SourceFileLoader(
+            "module.name",
+            os.path.abspath(args.filename)).load_module()
+    else:
+        print("Python version not supported (<3.5)")
+        sys.exit(1)
     cases_generator = m.cases_generator
     
     # *********************************************************************** #
