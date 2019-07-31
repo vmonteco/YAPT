@@ -3,7 +3,7 @@
 from tools.elems import options, min_len, precision, len_mod
 
 def subset_comb_generator_factory(subset):
-    yield from ([b''.join([b'%', opt, ml, p, lm, subset[1], b'\n']), *v]
+    yield from ([b''.join([b'%', opt, ml, p, lm, subset[1], b'\n'])] + v
                 for opt in options
                 for ml in min_len
                 for p in precision
