@@ -62,11 +62,15 @@ So the `cases_generator` factory return could look like this :
 
 #### What tests are provided?
 
-* full_cases.py : This test file gathers content from many others full tests that can be passed as well to yapt.py. These tests are generated combinatorially and there are a *lot* of cases.
+* full.py : This test file gathers content from many others full tests that can be passed as well to yapt.py. These tests are generated combinatorially and there are a *lot* of cases.
 
-* regular_tests.py : Some tests that should be enough to check most of your ft_printf feature (but probably not all). It also gathers other regular test sets.
+* old_full.py : Old full tests, the subject was changed and those are the old full cases.
 
-* dummy_tests.py : Just a dummy test with 4 cases to check that the programm runs. It can be a first check to do before doing more advanced tests.
+* regular.py : Some tests that should be enough to check most of your ft_printf feature (but probably not all). It also gathers other regular test sets.
+
+* old_regular.py : Old regular tests, the subject was changed and those are the old cases.
+
+* dummy_cases.py : Just a dummy test with 4 cases to check that the programm runs. It can be a first check to do before doing more advanced tests.
 
 ### What does the output mean?
 
