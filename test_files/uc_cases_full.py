@@ -8,7 +8,7 @@ from tools.factories import generator_comb_factory, subset_comb_generator_factor
 options = [b''.join(list(i)) for i in powerset([b' ', b'+', b'-', b'#'])]
 
 def uc_subset_comb_generator_factory(subset):
-    yield from ([b''.join([b'%', opt, ml, lm, subset[1], b'\n']), *v]
+    yield from ([b''.join([b'%', opt, ml, lm, subset[1], b'\n']),] + v
                 for opt in options
                 for ml in min_len
                 for lm in len_mod
