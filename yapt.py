@@ -385,22 +385,19 @@ if __name__ == '__main__':
     # *********************************************************************** #
 
     version = (sys.version_info.major, sys.version_info.minor)
-    if (version == (3, 4)):
-        print("Python version not supported (<3.5)")
-        sys.exit(1)
+    if (version == (3, 4) or version >= (3, 6)):
+        from importlib.machinery import SourceFileLoader
+        m = SourceFileLoader(
+            "module.name",
+            os.path.abspath(args.filename)).load_module()
     elif (version == (3, 5)):
         import importlib.util
         spec = importlib.util.spec_from_file_location(
             "module.name", os.path.abspath(args.filename))
         m = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(m)
-    elif (version >= (3, 6)):
-        from importlib.machinery import SourceFileLoader
-        m = SourceFileLoader(
-            "module.name",
-            os.path.abspath(args.filename)).load_module()
     else:
-        print("Python version not supported (<3.5)")
+        print("Python version not supported (<3.4)")
         sys.exit(1)
     cases_generator = m.cases_generator
     
