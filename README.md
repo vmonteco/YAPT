@@ -8,7 +8,7 @@ This test suite is a dummy test set intended to help 42 students (and hopefully 
 
 ### How to use :
 
-0. Ensure you at least have `Python3.6` (`brew install python3` should do the trick).
+0. ~~Ensure you at least have `Python3.6` (`brew install python3` should do the trick).~~ Now compatible with `Python>=3.4`.
 
 1. Link your project's path to `./ft_printf` in the YAPT directory :
 
