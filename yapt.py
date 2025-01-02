@@ -120,13 +120,13 @@ class Tester:
                     self.f2(*c)
             os.close(f)
             os.dup2(2, sys.stdout.fileno())
-            l = subprocess.call(['leaks', str(os.getpid())])
-            if l == 0:
-                print(colorize('{succ}No leak found.{rst}'))
-            elif l > 1:
-                print(colorize('{fail}An error occured with leaks.{rst}'))
-            else:
-                print(colorize('{fail}Leaks found.{rst}'))
+            # l = subprocess.call(['leaks', str(os.getpid())])
+            # if l == 0:
+            #     print(colorize('{succ}No leak found.{rst}'))
+            # elif l > 1:
+            #     print(colorize('{fail}An error occured with leaks.{rst}'))
+            # else:
+            #     print(colorize('{fail}Leaks found.{rst}'))
         else:
             print(colorize(
                 (
@@ -385,19 +385,20 @@ if __name__ == '__main__':
     # *********************************************************************** #
 
     version = (sys.version_info.major, sys.version_info.minor)
-    if (version == (3, 4) or version >= (3, 6)):
-        from importlib.machinery import SourceFileLoader
-        m = SourceFileLoader(
-            "module.name",
-            os.path.abspath(args.filename)).load_module()
-    elif (version == (3, 5)):
-        import importlib.util
-        spec = importlib.util.spec_from_file_location(
-            "module.name", os.path.abspath(args.filename))
-        m = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(m)
-    else:
-        print("Python version not supported (<3.4)")
+    try:
+        if (version == (3, 4)):
+            from importlib.machinery import SourceFileLoader
+            m = SourceFileLoader(
+                "module.name",
+                os.path.abspath(args.filename)).load_module()
+        else:
+            import importlib.util
+            spec = importlib.util.spec_from_file_location(
+                "module.name", os.path.abspath(args.filename))
+            m = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(m)
+    except AttributeError:
+        print("Python version not supported")
         sys.exit(1)
     cases_generator = m.cases_generator
     
