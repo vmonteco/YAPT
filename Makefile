@@ -1,6 +1,6 @@
-FT_PRINTF_PATH=ft_printf
+FT_PRINTF_PATH=libft
 FT_PRINTF_INC_PATH=$(FT_PRINTF_PATH)/includes
-LIB_A=$(FT_PRINTF_PATH)/libftprintf.a
+LIB_A=$(FT_PRINTF_PATH)/libft.a
 LIB_SO=libftprintf.so
 PY_TEST=./ft_printf_test.py
 UNAME_S := $(shell uname -s)
