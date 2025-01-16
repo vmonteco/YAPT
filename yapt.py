@@ -20,7 +20,12 @@ libftprintf = ctypes.cdll.LoadLibrary(os.path.join(BASE_DIR, 'libftprintf.so'))
 libc = ctypes.cdll.LoadLibrary(ctypes.util.find_library('c'))
 
 ft_printf = libftprintf.ft_printf
+ft_printf.argstypes = (ctypes.c_char_p,)
+ft_printf.restype = ctypes.c_int
 printf = libc.printf
+printf.argstypes = (ctypes.c_char_p,)
+printf.restype = ctypes.c_int
+
 
 # *************************************************************************** #
 #                                Defining texts.                              #
@@ -302,6 +307,8 @@ class Tester:
                          res['f2']['output']
                      ))
         elif (res['f1']['status'] == res['f2']['status']):
+            self.counters['local_success'] += 1
+            self.counters['global_success'] += 1
             cols['res1'] = colors['succ']
             cols['res2'] = colors['succ']
             cols['res'] = colors['ntrl']
