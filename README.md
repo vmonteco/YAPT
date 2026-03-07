@@ -1,4 +1,4 @@
-# Yet Another Printf Tester (YAPT) :
+# Yet Another Printf Tester (YAPT) - Archived:
 
 ## Test suite for comparison between an homemade C printf (aka. `ft_printf` for duoquadragintians) and OSX's printf written in Python 3.
 
